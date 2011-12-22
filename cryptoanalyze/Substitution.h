@@ -60,9 +60,9 @@ private:
 	int HammingDist(int x, int y);
 
 
-	std::vector<int> subs, subs_inv;
 
 public:
+	std::vector<int> subs, subs_inv;
 	int size;
 	int bits;
 

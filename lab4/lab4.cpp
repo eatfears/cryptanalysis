@@ -21,13 +21,13 @@ int main()
 	cout << "Working.." << endl;
 
 	Cipher ciph(my_s,my_p);
-	
+
 	unsigned char str[] = "Hello world!";
 	unsigned char key[] = "222222";
 
 	cout << ciph.DecryptBlock( ciph.CryptBlock(str, key), key) << endl;
 	//cout << ciph.CryptBlock(str, key) << endl;
-	
+
 	cout << ciph.sub->PrintSummTable() << endl;
 	cout << ciph.sub->PrintSweightTable() << endl;
 
