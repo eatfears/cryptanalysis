@@ -1,6 +1,7 @@
 //lab6.cpp
 #include "stdafx.h"
 
+#define ROUND(x)	(x>0.5?1:0)
 
 double MAX(double n, ...)
 {
@@ -189,6 +190,42 @@ void Xor(double *x, double *k, int size)
 		x[i] = Xor(x[i],k[i]);
 }
 
+void dtouc(double *dX, unsigned char *ucX)
+{
+	unsigned char ucTemp;
+
+	for (int i = 0; i < 4; i+=4)
+	{
+		ucX[i] = 0;
+		ucX[i] += ROUND(dX[i*4 + 0]);
+		ucX[i] += ROUND(dX[i*4 + 1])*2;
+		ucX[i] += ROUND(dX[i*4 + 2])*2*2;
+		ucX[i] += ROUND(dX[i*4 + 3])*2*2*2;
+		ucX[i] += ROUND(dX[i*4 + 4])*2*2*2*2;
+		ucX[i] += ROUND(dX[i*4 + 5])*2*2*2*2*2;
+		ucX[i] += ROUND(dX[i*4 + 6])*2*2*2*2*2*2;
+		ucX[i] += ROUND(dX[i*4 + 7])*2*2*2*2*2*2*2;
+	}
+}
+
+void uctod(unsigned char *ucX, double *dX)
+{
+	unsigned char ucTemp;
+
+	for (int i = 0; i < 4; i++)
+	{
+		ucTemp = ucX[i];
+		dX[8*i+7] = ucTemp%2;
+		dX[8*i+6] = ucTemp/2%2;
+		dX[8*i+5] = ucTemp/2/2%2;
+		dX[8*i+4] = ucTemp/2/2/2%2;
+		dX[8*i+3] = ucTemp/2/2/2/2%2;
+		dX[8*i+2] = ucTemp/2/2/2/2/2%2;
+		dX[8*i+1] = ucTemp/2/2/2/2/2/2%2;
+		dX[8*i+0] = ucTemp/2/2/2/2/2/2/2%2;
+	}
+}
+
 int main()
 {
 	srand (time(NULL));
@@ -204,64 +241,148 @@ int main()
 	//------------------------------------------------
 	Cipher ciph(my_s,my_p);
 
+	cout << ciph.PrintPermutation();
 	cout << "Working.." << endl;
 
-	double dX[32];
+	double dX[32] = {
+		1-0.01, 0.03, 0.04, 0.05, 0.08, 0.02, 0.07, 0.09,
+		0.11, 0.13, 0.14, 0.15, 0.18, 0.12, 0.17, 0.19,
+		0.21, 0.23, 0.24, 0.25, 0.28, 0.22, 0.27, 0.29,
+		0.31, 0.33, 0.34, 0.35, 0.38, 0.32, 0.37, 0.39};
 	double dY[32];
-	double dK[32] = { 
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0};
+	double dK[32];
 	double dTemp[32];
-	unsigned char cX[4];
+	double dF2X[32];
+	double dFinv2X[32];
+	double dH[32];
 
-	for(int i = 0; i < 32; i++)
-	{
-		dX[i] = 0.1;
-	}
+	unsigned char ucX[5] = "\x00\x00\x00\x00";//"0000";
+	unsigned char ucY[4];
+	unsigned char ucK[5] = "\x73\x56\xa3\x64";
 
-	for(int i = 0; i < 32; i++)
-		dY[i] = dX[i];
+	for(int i = 0; i < 4; i++)
+		ucY[i] = ucX[i];
 
-	for(int c = 0; c < 2; c++)
-	{
-		Xor(dY, dK, 32);
+ 	for(int c = 0; c < 4; c++)
+ 		ciph.CryptCycleBlock(ucY,ucK);
 
-		for(int i = 0; i < 32; i+=4)
-			Sub(dY+i);
 
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dY[i];
+// 	for (int i = 0; i < 4; i++) ucY[i]^=ucK[i];
+// 	ciph.sub->SubstituteStr(ucY, 4);
+// 	ciph.per->PermutateBlock(ucY);
 
-		for(int i = 0; i < 32; i++)
-			dY[i] = dTemp[ciph.per->pers[i]];
-	}
+
+	//uctod(ucX, dX);
+	uctod(ucK, dK);
+	uctod(ucY, dY);
+// 	for(int i = 0; i < 32; i++)
+// 	{	
+// 		dX[i] = 0.9*(dX[i]-0.5) + 0.5;
+// 		//dX[i] = 0.01*(rand()%100 - 50.0);
+// 	}
+
+	cout << "-----------------X-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dX[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+	
+	cout << "-----------------Y-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dY[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
 	/**/
+	for(int i = 0; i < 32; i++)
+		dF2X[i] = dX[i];
 	
 	for(int c = 0; c < 2; c++)
 	{
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dY[i];
-
-		for(int i = 0; i < 32; i++)
-			dY[i] = dTemp[ciph.per->pers_inv[i]];
-
+		Xor(dF2X, dK, 32);
+		
 		for(int i = 0; i < 32; i+=4)
-			SubInv(dY+i);
-
-		Xor(dY, dK, 32);
+			Sub(dF2X+i);
+			/**/
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dF2X[i];
+			
+		for(int i = 0; i < 32; i++)
+			dF2X[ciph.per->pers[i]] = dTemp[i];
+		/**/
 	}
 
-	cout << "x\t" << endl;
-	for (int i = 0; i < 32; i++)
-		cout << dX[i] << "\t";
-	cout << endl << endl;
-		
-	for (int i = 0; i < 32; i++)
-		cout << dY[i] << "\t";
-	cout << endl;
+	/**/
+	for(int i = 0; i < 32; i++)
+		dFinv2X[i] = dY[i];
 
+	for(int c = 0; c < 2; c++)
+	{
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dFinv2X[i];
+
+		for(int i = 0; i < 32; i++)
+			dFinv2X[ciph.per->pers_inv[i]] = dTemp[i];
+
+		for(int i = 0; i < 32; i+=4)
+			SubInv(dFinv2X+i);
+
+		Xor(dFinv2X, dK, 32);
+	}
+	/**/
+	
+	for(int i = 0; i < 32; i++)
+		dH[i] = dF2X[i];
+	Xor(dH,dFinv2X,32);
+	for(int i = 0; i < 32; i++)
+		dH[i] = 1.0 - dH[i];
+
+	/**/
+	
+	cout << "-----------------F2-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dF2X[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+	
+	cout << "-----------------F-2-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dFinv2X[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
+	/**/
+
+	cout << "-----------------H-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dH[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
+	double dMin = dH[0];
+	for (int i = 0; i < 32; i++)
+		if (dH[i] < dMin) dMin = dH[i];
+
+
+
+	cout << dMin << " " << 32.0 - 100*dMin << endl;
+	for (int i = 0; i < 32; i++)
+	{
+		if(dX[i] > dMin && dX[i] < 1.0-dMin) cout << '*' << "\t";
+		else cout << ROUND(dX[i]) << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}
+	/**/
 	//cout << u[0] << " " << u[1] << " " << u[2] << " " << u[3] << endl;
 	//cout << u[4] << " " << u[5] << " " << u[6] << " " << u[7] << endl;
 	//cout << v1(0,0,0,0) << v2(0,0,0,0) << v3(0,0,0,0) << v4(0,0,0,0) << endl;

@@ -69,14 +69,20 @@ string Permutation::PrintPermutation()
 unsigned char* Permutation::PermutateBlock(unsigned char* czInput)
 {
 	long int iResult = 0, iInput;
+	unsigned char czTemp[4] = {czInput[3], czInput[2], czInput[1], czInput[0]};
 
-	memcpy(&iInput, czInput, 4);
+	memcpy(&iInput, czTemp, 4);
 
 	for (int i = 0; i < size; i++)
 	{
-		if(iInput & (1<<i)) iResult |= 1<<pers[i]; 
+		if(iInput & (1<<(31-i))) 
+			iResult |= 1<<(31-pers[i]); 
 	}
-	memcpy(czInput, &iResult, 4);
+	memcpy(czTemp, &iResult, 4);
+	czInput[0] = czTemp[3];
+	czInput[1] = czTemp[2];
+	czInput[2] = czTemp[1];
+	czInput[3] = czTemp[0];
 
 	return czInput;
 }
@@ -84,14 +90,20 @@ unsigned char* Permutation::PermutateBlock(unsigned char* czInput)
 unsigned char* Permutation::PermutateBlockInverce(unsigned char* czInput)
 {
 	long int iResult = 0, iInput;
+	unsigned char czTemp[4] = {czInput[3], czInput[2], czInput[1], czInput[0]};
 
-	memcpy(&iInput, czInput, 4);
+	memcpy(&iInput, czTemp, 4);;
 
 	for (int i = 0; i < size; i++)
 	{
-		if(iInput & (1<<i)) iResult |= 1<<pers_inv[i]; 
+		if(iInput & (1<<(31-i))) 
+			iResult |= 1<<(31-pers_inv[i]); 
 	}
-	memcpy(czInput, &iResult, 4);
+	memcpy(czTemp, &iResult, 4);
+	czInput[0] = czTemp[3];
+	czInput[1] = czTemp[2];
+	czInput[2] = czTemp[1];
+	czInput[3] = czTemp[0];
 
 	return czInput;
 }
