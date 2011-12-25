@@ -64,7 +64,6 @@ double V2(double u1, double u2, double u3, double u4)
 double V3(double u1, double u2, double u3, double u4)
 {
 	double res;
-	MIN(1.0-u1,1.0-u2,1.0-u3,-1.0);
 	res = MAX(
 		MIN(1.0-u1,1.0-u2,1.0-u3,-1.0),
 		MIN(1.0-u1,u2,u4,-1.0),
@@ -241,14 +240,18 @@ int main()
 	//------------------------------------------------
 	Cipher ciph(my_s,my_p);
 
+	for (int i = 0; i < 16; i++) cout << ciph.sub->subs_inv[i] << ", "; cout << endl;
 	cout << ciph.PrintPermutation();
 	cout << "Working.." << endl;
 
+	double dXX[32];
 	double dX[32] = {
-		1-0.01, 0.03, 0.04, 0.05, 0.08, 0.02, 0.07, 0.09,
-		0.11, 0.13, 0.14, 0.15, 0.18, 0.12, 0.17, 0.19,
-		0.21, 0.23, 0.24, 0.25, 0.28, 0.22, 0.27, 0.29,
-		0.31, 0.33, 0.34, 0.35, 0.38, 0.32, 0.37, 0.39};
+		0.14, 0.32, 0.18, 0.09, 0.27, 0.04, 0.23, 0.13,
+		0.06, 0.24, 0.10, 0.01, 0.19, 0.28, 0.15, 0.05,
+		0.30, 0.16, 0.02, 0.25, 0.11, 0.20, 0.07, 0.29,
+		0.22, 0.08, 0.26, 0.17, 0.03, 0.12, 0.31, 0.21
+	};
+
 	double dY[32];
 	double dK[32];
 	double dTemp[32];
@@ -256,30 +259,33 @@ int main()
 	double dFinv2X[32];
 	double dH[32];
 
-	unsigned char ucX[5] = "\x00\x00\x00\x00";//"0000";
+	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
 	unsigned char ucY[4];
 	unsigned char ucK[5] = "\x73\x56\xa3\x64";
 
 	for(int i = 0; i < 4; i++)
 		ucY[i] = ucX[i];
+	
+	ciph.CryptBlock(ucY,ucK);
 
- 	for(int c = 0; c < 4; c++)
- 		ciph.CryptCycleBlock(ucY,ucK);
-
-
-// 	for (int i = 0; i < 4; i++) ucY[i]^=ucK[i];
-// 	ciph.sub->SubstituteStr(ucY, 4);
-// 	ciph.per->PermutateBlock(ucY);
-
-
-	//uctod(ucX, dX);
+	uctod(ucX, dXX);
 	uctod(ucK, dK);
 	uctod(ucY, dY);
-// 	for(int i = 0; i < 32; i++)
-// 	{	
-// 		dX[i] = 0.9*(dX[i]-0.5) + 0.5;
-// 		//dX[i] = 0.01*(rand()%100 - 50.0);
-// 	}
+
+	cout << "-----------------X orig--------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dXX[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}
+	cout << endl << endl;
+
+
+	for (int i = 0; i < 32; i++)
+	{
+		int sign = rand()%2;
+		if (sign) dX[i] = 1.0 - dX[i];
+	}
 
 	cout << "-----------------X-------------------" << endl;
 	for (int i = 0; i < 32; i++)
@@ -288,7 +294,7 @@ int main()
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-	
+	/*
 	cout << "-----------------Y-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -320,6 +326,8 @@ int main()
 	for(int i = 0; i < 32; i++)
 		dFinv2X[i] = dY[i];
 
+	Xor(dFinv2X, dK, 32);
+
 	for(int c = 0; c < 2; c++)
 	{
 		for(int i = 0; i < 32; i++)
@@ -335,15 +343,8 @@ int main()
 	}
 	/**/
 	
-	for(int i = 0; i < 32; i++)
-		dH[i] = dF2X[i];
-	Xor(dH,dFinv2X,32);
-	for(int i = 0; i < 32; i++)
-		dH[i] = 1.0 - dH[i];
-
-	/**/
-	
-	cout << "-----------------F2-------------------" << endl;
+	/*
+	cout << "-----------------F2------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
 		cout << dF2X[i] << "\t";
@@ -351,7 +352,7 @@ int main()
 	}	
 	cout << endl << endl;
 	
-	cout << "-----------------F-2-------------------" << endl;
+	cout << "-----------------F-2-----------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
 		cout << dFinv2X[i] << "\t";
@@ -361,7 +362,15 @@ int main()
 
 	/**/
 
-	cout << "-----------------H-------------------" << endl;
+	for(int i = 0; i < 32; i++)
+		dH[i] = dF2X[i];
+	Xor(dH,dFinv2X,32);
+	for(int i = 0; i < 32; i++)
+		dH[i] = 1.0 - dH[i];
+
+	/**/
+
+	cout << "-------------1-(F2+F-2)--------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
 		cout << dH[i] << "\t";
@@ -373,8 +382,6 @@ int main()
 	for (int i = 0; i < 32; i++)
 		if (dH[i] < dMin) dMin = dH[i];
 
-
-
 	cout << dMin << " " << 32.0 - 100*dMin << endl;
 	for (int i = 0; i < 32; i++)
 	{
@@ -382,13 +389,6 @@ int main()
 		else cout << ROUND(dX[i]) << "\t";
 		if(!((i+1)%8)) cout << endl;
 	}
-	/**/
-	//cout << u[0] << " " << u[1] << " " << u[2] << " " << u[3] << endl;
-	//cout << u[4] << " " << u[5] << " " << u[6] << " " << u[7] << endl;
-	//cout << v1(0,0,0,0) << v2(0,0,0,0) << v3(0,0,0,0) << v4(0,0,0,0) << endl;
-
-	//cout << MAX(0.0,0.0,-1);
-	//cout << MAX(0.0,0.0,-1.0);
 
 	/*
 	for (int i = 0; i < 16; i++)
