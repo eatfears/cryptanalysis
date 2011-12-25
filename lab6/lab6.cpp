@@ -240,20 +240,20 @@ int main()
 	//------------------------------------------------
 	Cipher ciph(my_s,my_p);
 
-	for (int i = 0; i < 16; i++) cout << ciph.sub->subs_inv[i] << ", "; cout << endl;
-	cout << ciph.PrintPermutation();
+	//for (int i = 0; i < 16; i++) cout << ciph.sub->subs_inv[i] << ", "; cout << endl;
+	//cout << ciph.PrintPermutation();
 	cout << "Working.." << endl;
 
-	double dXX[32];
-	double dX[32] = {
+	double dKK[32];
+	double dK[32] = {
 		0.14, 0.32, 0.18, 0.09, 0.27, 0.04, 0.23, 0.13,
 		0.06, 0.24, 0.10, 0.01, 0.19, 0.28, 0.15, 0.05,
 		0.30, 0.16, 0.02, 0.25, 0.11, 0.20, 0.07, 0.29,
 		0.22, 0.08, 0.26, 0.17, 0.03, 0.12, 0.31, 0.21
 	};
 
+	double dX[32];
 	double dY[32];
-	double dK[32];
 	double dTemp[32];
 	double dF2X[32];
 	double dFinv2X[32];
@@ -268,42 +268,26 @@ int main()
 	
 	ciph.CryptBlock(ucY,ucK);
 
-	uctod(ucX, dXX);
-	uctod(ucK, dK);
+
+	uctod(ucK, dKK);
+	uctod(ucX, dX);
 	uctod(ucY, dY);
 
-	cout << "-----------------X orig--------------" << endl;
+	cout << "-----------------K orig--------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
-		cout << dXX[i] << "\t";
+		cout << dKK[i] << "\t";
 		if(!((i+1)%8)) cout << endl;
 	}
 	cout << endl << endl;
 
-
+ST:
 	for (int i = 0; i < 32; i++)
 	{
 		int sign = rand()%2;
-		if (sign) dX[i] = 1.0 - dX[i];
+		if (sign) dK[i] = 1.0 - dK[i];
 	}
 
-	cout << "-----------------X-------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dX[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-	/*
-	cout << "-----------------Y-------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dY[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
-	/**/
 	for(int i = 0; i < 32; i++)
 		dF2X[i] = dX[i];
 	
@@ -342,8 +326,41 @@ int main()
 		Xor(dFinv2X, dK, 32);
 	}
 	/**/
-	
+
+	for(int i = 0; i < 32; i++)
+		dH[i] = dF2X[i];
+	Xor(dH,dFinv2X,32);
+	for(int i = 0; i < 32; i++)
+		dH[i] = 1.0 - dH[i];
+
+	/**/
+
+	double dMin = dH[0];
+	for (int i = 0; i < 32; i++)
+		if (dH[i] < dMin) dMin = dH[i];
+	//---------------------------------------------------------------------------------------
+	if(32.0 - 100*dMin < 8) goto ST;
+
+
+	cout << "-----------------K-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dK[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+	/**/
 	/*
+	cout << "-----------------Y-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dY[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
+	/**/
+
 	cout << "-----------------F2------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -362,14 +379,7 @@ int main()
 
 	/**/
 
-	for(int i = 0; i < 32; i++)
-		dH[i] = dF2X[i];
-	Xor(dH,dFinv2X,32);
-	for(int i = 0; i < 32; i++)
-		dH[i] = 1.0 - dH[i];
-
-	/**/
-
+	
 	cout << "-------------1-(F2+F-2)--------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -377,16 +387,13 @@ int main()
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-
-	double dMin = dH[0];
-	for (int i = 0; i < 32; i++)
-		if (dH[i] < dMin) dMin = dH[i];
+	/**/
 
 	cout << dMin << " " << 32.0 - 100*dMin << endl;
 	for (int i = 0; i < 32; i++)
 	{
-		if(dX[i] > dMin && dX[i] < 1.0-dMin) cout << '*' << "\t";
-		else cout << ROUND(dX[i]) << "\t";
+		if(dK[i] > dMin && dK[i] < 1.0-dMin) cout << '*' << "\t";
+		else cout << ROUND(dK[i]) << "\t";
 		if(!((i+1)%8)) cout << endl;
 	}
 
