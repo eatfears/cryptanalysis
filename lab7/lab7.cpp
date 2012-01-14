@@ -248,6 +248,10 @@ int main()
 	double dTemp[32];
 	double dF2X[32];
 	double dFinv2X[32];
+	double dH[2] = {1.0, 1.0};
+	double dHx;
+	int j = 0;
+	int r = 0;
 
 	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
 	unsigned char ucY[4];
@@ -256,10 +260,9 @@ int main()
 	for(int i = 0; i < 4; i++)
 		ucY[i] = ucX[i];
 	
-	//ciph.CryptBlock(ucY,ucK);
+	ciph.CryptBlock(ucY,ucK);
 
-
-	uctod(ucK, dK);
+	//uctod(ucK, dK);
 	uctod(ucK, dKK);
 	uctod(ucX, dX);
 	uctod(ucY, dY);
@@ -273,52 +276,77 @@ int main()
 	cout << endl << endl;
 
 
-	for(int i = 0; i < 32; i++)
-		dF2X[i] = dX[i];
-	
-	//не равны!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	for(int c = 0; c < 2; c++)
+LOOP:
+	j = r;
+	dHx = pow(2.0, -32);
+
+	for (int i = 0; i < j; i++)
+		dK[i] = dKK[i];
+
+	while (j < 32)
 	{
-		Xor(dF2X, dK, 32);
-		
-		for(int i = 0; i < 32; i+=4)
-			Sub(dF2X+i);
+		for(int k = 0; k < 2; k++)
+		{
+			dH[k] = 1.0;
+			if(k == 0) dK[j] = 0;
+			if(k == 1) dK[j] = 1;
+
+			for(int i = 0; i < 32; i++)
+				dF2X[i] = dX[i];
+
+			for(int c = 0; c < 2; c++)
+			{
+				Xor(dF2X, dK, 32);
+
+				for(int i = 0; i < 32; i+=4)
+					Sub(dF2X+i);
+				/**/
+				for(int i = 0; i < 32; i++)
+					dTemp[i] = dF2X[i];
+
+				for(int i = 0; i < 32; i++)
+					dF2X[ciph.per->pers[i]] = dTemp[i];
+				/**/
+			}
+
 			/**/
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dF2X[i];
-			
-		for(int i = 0; i < 32; i++)
-			dF2X[ciph.per->pers[i]] = dTemp[i];
-		/**/
+			for(int i = 0; i < 32; i++)
+				dFinv2X[i] = dY[i];
+
+			Xor(dFinv2X, dK, 32);
+
+			for(int c = 0; c < 2; c++)
+			{
+				for(int i = 0; i < 32; i++)
+					dTemp[i] = dFinv2X[i];
+
+				for(int i = 0; i < 32; i++)
+					dFinv2X[ciph.per->pers_inv[i]] = dTemp[i];
+
+				for(int i = 0; i < 32; i+=4)
+					SubInv(dFinv2X+i);
+
+				Xor(dFinv2X, dK, 32);
+			}
+			/**/
+
+
+			for(int i = 0; i < 32; i++)
+				dH[k] *= dF2X[i]*dFinv2X[i] + (1.0 - dF2X[i])*(1.0 - dFinv2X[i]);
+		}
+
+		if ((dH[0] < dHx)&&(dHx < dH[1])) {dHx = dH[1]; dK[j] = 1;}
+		else if ((dH[1] < dHx)&&(dHx < dH[0])) {dHx = dH[0]; dK[j] = 0;}
+		else {dHx = 0; dK[j] = 0.5;}
+
+		j++;
+		if(dHx == 0) break;
+
 	}
-
-	/**/
-	for(int i = 0; i < 32; i++)
-		dFinv2X[i] = dY[i];
-
-	Xor(dFinv2X, dK, 32);
-
-	for(int c = 0; c < 2; c++)
-	{
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dFinv2X[i];
-
-		for(int i = 0; i < 32; i++)
-			dFinv2X[ciph.per->pers_inv[i]] = dTemp[i];
-
-		for(int i = 0; i < 32; i+=4)
-			SubInv(dFinv2X+i);
-
-		Xor(dFinv2X, dK, 32);
-	}
-	/**/
+	if (dHx == 0) {r++; goto LOOP;}
 	
-	double dH = 1.0;
-
-	for(int i = 0; i < 32; i++)
-		dH *= dF2X[i]*dFinv2X[i] + (1.0 - dF2X[i])*(1.0 - dFinv2X[i]);
-
 	//---------------------------------------------------------------------------------------
+	
 
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
@@ -327,8 +355,9 @@ int main()
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-	/**/
 	
+	/**/
+	/*
 	cout << "-----------------Y-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -338,7 +367,7 @@ int main()
 	cout << endl << endl;
 
 	/**/
-
+	/*
 	cout << "-----------------F2------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -357,7 +386,8 @@ int main()
 
 	/**/
 
-	cout << "H = " << dH << endl;
+	cout << "H* = " << dHx << endl;
+	cout << "r  = " << r << endl;
 	
 
 	/*
