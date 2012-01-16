@@ -150,8 +150,11 @@ void uctod(unsigned char *ucX, double *dX)
 	}
 }
 
-double H(double *dF2X, double *dFinv2X, double *dK, double *dX, double *dY, Cipher *ciph)
+double H(double *dK, double *dX, double *dY, Cipher *ciph)
 {
+	double dF2X[32];
+	double dFinv2X[32];
+
 	double dTemp[32];
 	double dH = 1.0;
 
@@ -200,87 +203,19 @@ double H(double *dF2X, double *dFinv2X, double *dK, double *dX, double *dY, Ciph
 	return dH;
 }
 
-int main()
+double alg1(double *dK, double *dX, double *dY, Cipher *ciph)
 {
-	srand (time(NULL));
-
-	//------------------------------------------------
-	vector<int>  my_s, my_p;
-	//------------------------------------------------
-	int my_sub[16]			= {2, 11, 13, 0, 9, 7, 4, 14, 1, 12, 8, 15, 6, 10, 3, 5};
-	//------------------------------------------------
-	my_s = vector<int>(my_sub, my_sub+16);
-	my_p = vector<int>(32); 
-	for (int i = 0; i < 32; i++) my_p[i] = (i*5 + 11)%32;
-	//------------------------------------------------
-	Cipher ciph(my_s,my_p);
-
-	//for (int i = 0; i < 16; i++) cout << ciph.sub->subs_inv[i] << ", "; cout << endl;
-	//cout << ciph.PrintPermutation();
-	cout << "Working.." << endl;
-
-	double dKK[32];
-	double dK[32] = {
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
-	};
-
-	double dX[32];
-	double dY[32];
-	double dF2X[32];
-	double dFinv2X[32];
-	double dH[32] = {1.0, 1.0};
-	double dHx, dHmax;
-	int j = 0;
-	int imax;
+	double dH[32];
 	double dJ[32];
+	double dHx, dHmax;
+	int imax;
 
-	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
-	unsigned char ucY[4];
-	unsigned char ucK[5] = "\x73\x56\xa3\x64";
-
-	for(int i = 0; i < 4; i++)
-		ucY[i] = ucX[i];
-	
-	ciph.CryptBlock(ucY,ucK);
-
-	//uctod(ucK, dK);
-	uctod(ucK, dKK);
-	uctod(ucX, dX);
-	uctod(ucY, dY);
-
-	cout << "-----------------K orig--------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dKK[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}
-	cout << endl << endl;
-
-	for (int i = 0; i < 32; i++)
-	{
-		if(!(rand()%10)) dK[i] = 1.0;
-		if(!(rand()%10)) dK[i] = 0.0;
-	}
-
-	cout << "-----------------K-------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dK[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
-	//---------------------------------------------------------------------------------------
 	for (int i = 0; i < 32; i++)
 		dJ[i] = 0;
 
-	dHx = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+	dHx = H(dK, dX, dY, ciph);
 
-	cout << "H* = " << dHx << endl;
-
+	//cout << "H* = " << dHx << endl;
 
 STEP2:
 	for(int i = 0; i < 32; i++)
@@ -290,9 +225,9 @@ STEP2:
 			double dH0, dH1;
 
 			dK[i] = 0.0;
-			dH0 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH0 = H(dK, dX, dY, ciph);
 			dK[i] = 1.0;
-			dH1 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH1 = H(dK, dX, dY, ciph);
 
 			if((dH0 < dHx)&&(dHx < dH1))
 			{
@@ -314,9 +249,9 @@ STEP2:
 			double dH05, dH1;
 
 			dK[i] = 0.5;
-			dH05 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH05 = H(dK, dX, dY, ciph);
 			dK[i] = 1.0;
-			dH1 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH1 = H(dK, dX, dY, ciph);
 
 			if((dH05 < dHx)&&(dHx < dH1))
 			{
@@ -338,9 +273,9 @@ STEP2:
 			double dH0, dH05;
 
 			dK[i] = 0.0;
-			dH0 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH0 = H(dK, dX, dY, ciph);
 			dK[i] = 0.5;
-			dH05 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dH05 = H(dK, dX, dY, ciph);
 
 			if((dH0 < dHx)&&(dHx < dH05))
 			{
@@ -372,10 +307,131 @@ STEP2:
 		dHx = dHmax;
 		goto STEP2;
 	}
+
+	return dHmax;
+}
+
+typedef struct p
+{
+	int p00, p10, p01, p11;
+} probability;
+
+int main()
+{
+	srand (time(NULL));
+
+	//------------------------------------------------
+	vector<int>  my_s, my_p;
+	//------------------------------------------------
+	int my_sub[16]			= {2, 11, 13, 0, 9, 7, 4, 14, 1, 12, 8, 15, 6, 10, 3, 5};
+	//------------------------------------------------
+	my_s = vector<int>(my_sub, my_sub+16);
+	my_p = vector<int>(32); 
+	for (int i = 0; i < 32; i++) my_p[i] = (i*5 + 11)%32;
+	//------------------------------------------------
+	Cipher ciph(my_s,my_p);
+
+	//for (int i = 0; i < 16; i++) cout << ciph.sub->subs_inv[i] << ", "; cout << endl;
+	//cout << ciph.PrintPermutation();
+	cout << "Working.." << endl;
+
+	double dKK[32];
+	double dK[32] = {
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0
+	};
+
+	double dX[32];
+	double dY[32];
+
+	double dHx, dHmax;
+	int j = 0;
+	probability P[32];
+
+	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
+	unsigned char ucY[4];
+	unsigned char ucK[5] = "\x73\x56\xa3\x64";
+
+	for(int i = 0; i < 4; i++)
+		ucY[i] = ucX[i];
 	
+	ciph.CryptBlock(ucY,ucK);
+
+	uctod(ucK, dK);
+	uctod(ucK, dKK);
+	uctod(ucX, dX);
+	uctod(ucY, dY);
+
+	cout << "-----------------K orig--------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dKK[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}
+	cout << endl << endl;
+
+	for (int i = 0; i < 32; i++)
+	{
+		P[i].p00 = 0;
+		P[i].p01 = 0;
+		P[i].p10 = 0;
+		P[i].p11 = 0;
+	}
+	//---------------------------------------------------------------------------------------
+
+	for (int t = 0; t < 100; t++)
+	{
+		
+		for (int i = 0; i < 32; i++)
+		{
+			switch (rand()%100)
+			{
+			case 0: dK[i] = 0.0;
+				break;
+			case 1: dK[i] = 1.0;
+				break;
+			default: dK[i] = 0.5;
+				break;
+			}
+		}
+		/**/
+		/*
+		cout << "-----------------K-------------------" << endl;
+		for (int i = 0; i < 32; i++)
+		{	
+			cout << dK[i] << "\t";
+			if(!((i+1)%8)) cout << endl;
+		}	
+		cout << endl << endl;
+		/**/
+		//---------------------------------------------------------------------------------------
+
+
+		dHx = alg1(dK, dX, dY, &ciph);
+
+
+		for (int i = 0; i < 32; i++)
+		{
+			if((dK[i] == 0.0)&&(dKK[i] == 0.0)) P[i].p00++;
+			if((dK[i] == 0.0)&&(dKK[i] == 1.0)) P[i].p01++;
+			if((dK[i] == 1.0)&&(dKK[i] == 0.0)) P[i].p10++;
+			if((dK[i] == 1.0)&&(dKK[i] == 1.0)) P[i].p11++;
+		}
+	}
 
 	//---------------------------------------------------------------------------------------
 	
+	for (int i = 0; i < 32; i++)
+	{
+		cout << P[i].p00 << " ";
+		cout << P[i].p01 << " ";
+		cout << P[i].p10 << " ";
+		cout << P[i].p11 << endl;
+	}
+	cout << endl << endl;
+
 
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
