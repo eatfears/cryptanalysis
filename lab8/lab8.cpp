@@ -150,6 +150,56 @@ void uctod(unsigned char *ucX, double *dX)
 	}
 }
 
+double H(double *dF2X, double *dFinv2X, double *dK, double *dX, double *dY, Cipher *ciph)
+{
+	double dTemp[32];
+	double dH = 1.0;
+
+	for(int i = 0; i < 32; i++)
+		dF2X[i] = dX[i];
+
+	for(int c = 0; c < 2; c++)
+	{
+		Xor(dF2X, dK, 32);
+
+		for(int i = 0; i < 32; i+=4)
+			Sub(dF2X+i);
+		/**/
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dF2X[i];
+
+		for(int i = 0; i < 32; i++)
+			dF2X[ciph->per->pers[i]] = dTemp[i];
+		/**/
+	}
+
+	/**/
+	for(int i = 0; i < 32; i++)
+		dFinv2X[i] = dY[i];
+
+	Xor(dFinv2X, dK, 32);
+
+	for(int c = 0; c < 2; c++)
+	{
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dFinv2X[i];
+
+		for(int i = 0; i < 32; i++)
+			dFinv2X[ciph->per->pers_inv[i]] = dTemp[i];
+
+		for(int i = 0; i < 32; i+=4)
+			SubInv(dFinv2X+i);
+
+		Xor(dFinv2X, dK, 32);
+	}
+	/**/
+
+	for(int i = 0; i < 32; i++)
+		dH *= 1 - abs(dF2X[i] - dFinv2X[i]);
+
+	return dH;
+}
+
 int main()
 {
 	srand (time(NULL));
@@ -179,13 +229,13 @@ int main()
 
 	double dX[32];
 	double dY[32];
-	double dTemp[32];
 	double dF2X[32];
 	double dFinv2X[32];
-	double dH[2] = {1.0, 1.0};
-	double dHx;
+	double dH[32] = {1.0, 1.0};
+	double dHx, dHmax;
 	int j = 0;
-	int r = 0;
+	int imax;
+	double dJ[32];
 
 	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
 	unsigned char ucY[4];
@@ -209,48 +259,120 @@ int main()
 	}
 	cout << endl << endl;
 
-
-	for(int i = 0; i < 32; i++)
-		dF2X[i] = dX[i];
-
-	for(int c = 0; c < 2; c++)
+	for (int i = 0; i < 32; i++)
 	{
-		Xor(dF2X, dK, 32);
-
-		for(int i = 0; i < 32; i+=4)
-			Sub(dF2X+i);
-		/**/
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dF2X[i];
-
-		for(int i = 0; i < 32; i++)
-			dF2X[ciph.per->pers[i]] = dTemp[i];
-		/**/
+		if(!(rand()%10)) dK[i] = 1.0;
+		if(!(rand()%10)) dK[i] = 0.0;
 	}
 
-	/**/
+	cout << "-----------------K-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dK[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
+	//---------------------------------------------------------------------------------------
+	for (int i = 0; i < 32; i++)
+		dJ[i] = 0;
+
+	dHx = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+
+	cout << "H* = " << dHx << endl;
+
+
+STEP2:
 	for(int i = 0; i < 32; i++)
-		dFinv2X[i] = dY[i];
-
-	Xor(dFinv2X, dK, 32);
-
-	for(int c = 0; c < 2; c++)
 	{
-		for(int i = 0; i < 32; i++)
-			dTemp[i] = dFinv2X[i];
+		if(dK[i] == 0.5)
+		{
+			double dH0, dH1;
 
-		for(int i = 0; i < 32; i++)
-			dFinv2X[ciph.per->pers_inv[i]] = dTemp[i];
+			dK[i] = 0.0;
+			dH0 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dK[i] = 1.0;
+			dH1 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
 
-		for(int i = 0; i < 32; i+=4)
-			SubInv(dFinv2X+i);
+			if((dH0 < dHx)&&(dHx < dH1))
+			{
+				dH[i] = dH1;
+				dJ[i] = 1.0;
+			}
+			else if((dH1 < dHx)&&(dHx < dH0))
+			{
+				dH[i] = dH0;
+				dJ[i] = 0.0;
+			} 
+			else
+			{
+				dH[i] = dHx;
+			}
+		}
+		else if(dK[i] == 0.0)
+		{
+			double dH05, dH1;
 
-		Xor(dFinv2X, dK, 32);
+			dK[i] = 0.5;
+			dH05 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dK[i] = 1.0;
+			dH1 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+
+			if((dH05 < dHx)&&(dHx < dH1))
+			{
+				dH[i] = dH1;
+				dJ[i] = 1.0;
+			}
+			else if((dH1 < dHx)&&(dHx < dH05))
+			{
+				dH[i] = dH05;
+				dJ[i] = 0.5;
+			} 
+			else
+			{
+				dH[i] = dHx;
+			}
+		} 
+		else if(dK[i] == 1.0)
+		{
+			double dH0, dH05;
+
+			dK[i] = 0.0;
+			dH0 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+			dK[i] = 0.5;
+			dH05 = H(dF2X, dFinv2X, dK, dX, dY, &ciph);
+
+			if((dH0 < dHx)&&(dHx < dH05))
+			{
+				dH[i] = dH05;
+				dJ[i] = 0.5;
+			}
+			else if((dH05 < dHx)&&(dHx < dH0))
+			{
+				dH[i] = dH0;
+				dJ[i] = 0.0;
+			} 
+			else
+			{
+				dH[i] = dHx;
+			}
+		}
 	}
-	/**/
 
+	dHmax = dH[0];
+	imax = 0;
 	for(int i = 0; i < 32; i++)
-		dH[0] *= 1 - abs(dF2X[i] - dFinv2X[i]);
+	{
+		if(dH[i] > dHmax) { dHmax = dH[i]; imax = i; }
+	}
+
+	if(dHmax > dHx) 
+	{
+		dK[imax] = dJ[imax];
+		dHx = dHmax;
+		goto STEP2;
+	}
+	
 
 	//---------------------------------------------------------------------------------------
 	
@@ -264,7 +386,7 @@ int main()
 	cout << endl << endl;
 	
 	/**/
-	
+	/*
 	cout << "-----------------Y-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -274,7 +396,7 @@ int main()
 	cout << endl << endl;
 
 	/**/
-	
+	/*
 	cout << "-----------------F2------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -293,8 +415,7 @@ int main()
 
 	/**/
 
-	cout << "H* = " << dH[0] << endl;
-	cout << "r  = " << r << endl;
+	cout << "H* = " << dHx << endl;
 	
 	/*
 	double s[] = {1, 1, 1, 1};
