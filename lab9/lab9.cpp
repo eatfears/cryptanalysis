@@ -3,12 +3,19 @@
 
 #define ROUND(x)	(x>0.5?1:0)
 
+int absmod(int x, int m)
+{
+	int res = abs(x);
+	res = res% (int)pow(2.0, m);
+	return res;
+}
+
 //((u1&&!u2&&u4) || (!u2&&u3&&!u4) || (u1&&!u3&&u4) || (!u2&&!u3&&u4) || (!u1&&u2&&!u3&&!u4) || (!u1&&u2&&u3&&u4))
 //v1 = u4 + u3 + u2 + u1*u3*u4 + u1*u2 + u1*u2*u3
 int V1(int u1, int u2, int u3, int u4, int m)
 {
 	int res;
-	res = abs(abs(abs(u4 - u3) - abs(u2 - u1*u3*u4)) - abs(u1*u2 - u1*u2*u3));
+	res = absmod(absmod(u2*absmod(1 - u1*absmod(1 - u3, m), m) - u3*absmod(1 - u1*u4, m), m) - u4, m);
 	return res;
 }
 
@@ -17,7 +24,7 @@ int V1(int u1, int u2, int u3, int u4, int m)
 int V2(int u1, int u2, int u3, int u4, int m)
 {
 	int res;
-	res = abs(abs(abs(u3 - u3*u4) - abs(u2*u4 - u1*u4)) - abs(abs(abs(u1*u3 - u1*u3*u4) - abs(u1*u2 - u1*u2*u4)) - u1*u2*u3));
+	res = absmod(absmod(u3*absmod(1 - u4, m) - u4*absmod(u2 - u1, m), m) - u1*absmod(absmod(1 - u4, m)*absmod(u3 - u2, m) - u2*u3, m), m);
 	return res;
 }
 
@@ -26,7 +33,7 @@ int V2(int u1, int u2, int u3, int u4, int m)
 int V3(int u1, int u2, int u3, int u4, int m)
 {
 	int res;
-	res = abs(abs(abs(1 - u3) - abs(u2 - u2*u4)) - abs(abs(abs(u2*u3 - u1) - abs(u1*u3 - u1*u3*u4)) - abs(u1*u2*u4 - u1*u2*u3)));
+	res = absmod(absmod(absmod(1 - u3, m) - u2*absmod(1 - u4, m), m) - absmod(u1*absmod(u2*absmod(u4 - u3, m) - u3*absmod(1 - u4, m), m) - absmod(u2*u3 - u1, m), m), m);
 	return res;
 }
 
@@ -35,7 +42,7 @@ int V3(int u1, int u2, int u3, int u4, int m)
 int V4(int u1, int u2, int u3, int u4, int m)
 {
 	int res;
-	res = abs(abs(u4 - u3) - abs(abs(u2 - u2*u4) - u1));
+	res = absmod(absmod(u4 - u3, m) - absmod(u2*absmod(1 - u4, m) - u1, m), m);
 	return res;
 }
 
@@ -45,7 +52,7 @@ int V4(int u1, int u2, int u3, int u4, int m)
 int U1(int v1, int v2, int v3, int v4, int m)
 {
 	int res;
-	res = abs(abs(v4 - v2*v3) - v1);
+	res = absmod(absmod(v4 - v2*v3, m) - v1, m);
 	return res;
 }
 
@@ -54,7 +61,7 @@ int U1(int v1, int v2, int v3, int v4, int m)
 int U2(int v1, int v2, int v3, int v4, int m)
 {
 	int res;
-	res = abs(abs(abs(v3*v4 - v2) - abs(v2*v3*v4 - v1*v4)) - abs(abs(v1*v3 - v1*v3*v4) - abs(v1*v2 - v1*v2*v4)));
+	res = absmod(absmod(v3*v4*absmod(1 - v2, m) - absmod(v2 - v1*v4, m), m) - v1*absmod(1 - v4, m)*absmod(v3 - v2, m), m);
 	return res;
 }
 
@@ -63,7 +70,7 @@ int U2(int v1, int v2, int v3, int v4, int m)
 int U3(int v1, int v2, int v3, int v4, int m)
 {
 	int res;
-	res = abs(abs(abs(1 - v4) - abs(v3 - v2*v4)) - abs(abs(v1*v3*v4 - v1*v2) - v1*v2*v4));
+	res = absmod(absmod(absmod(1 - v3, m) - v4*absmod(1 - v2, m), m) - v1*absmod(v2*absmod(1 - v4, m) - v3*v4, m), m);
 	return res;
 }
 
@@ -72,7 +79,7 @@ int U3(int v1, int v2, int v3, int v4, int m)
 int U4(int v1, int v2, int v3, int v4, int m)
 {
 	int res;
-	res = abs(abs(abs(abs(1 - v4) - abs(v3 - v3*v4)) - abs(abs(v2 - v2*v3) - abs(v2*v3*v4 - v1))) - abs(abs(v1*v4 - v1*v3*v4) - v1*v2*v4));
+	res = absmod(absmod(absmod(1 - v4, m)*absmod(1 - v3, m) - absmod(v2*absmod(1 - v3, m) - absmod(v2*v3*v4 - v1, m), m), m) - v1*v4*absmod(absmod(1 - v3, m) - v2, m), m);
 	return res;
 }
 
@@ -101,15 +108,6 @@ void SubInv(int *v, int m)
 	v[1] = temp2;
 	v[2] = temp3;
 	v[3] = temp4;
-}
-
-int absmod(int x, int m)
-{
-	int res = abs(x);
-
-	res = res% (int)pow(2.0, m);
-
-	return res;
 }
 
 int Xor(int x, int k, int m)
@@ -174,7 +172,7 @@ int val(int x, int m)
 	return res;
 }
 
-int H(int *dK, int *dX, int *dY, Cipher *ciph, int m)
+int H(int dK[32], int *dX, int *dY, Cipher *ciph, int m)
 {
 	int dF2X[32];
 	int dFinv2X[32];
@@ -199,7 +197,18 @@ int H(int *dK, int *dX, int *dY, Cipher *ciph, int m)
 			dF2X[ciph->per->pers[i]] = dTemp[i];
 		/**/
 	}
+	
+	//Xor(dF2X, dK, 32, m);
+	/*
+	cout << "-----------------dF2X-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dF2X[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
 
+	/**/
 	/**/
 	for(int i = 0; i < 32; i++)
 		dFinv2X[i] = dY[i];
@@ -220,104 +229,113 @@ int H(int *dK, int *dX, int *dY, Cipher *ciph, int m)
 		Xor(dFinv2X, dK, 32, m);
 	}
 	/**/
-
+	/*
+	cout << "-----------------dFinv2X-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dFinv2X[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+	/**/
 	for(int i = 0; i < 32; i++)
-		dH *= 1 - abs(dF2X[i] - dFinv2X[i]);
+		dH *= 1 + abs(dF2X[i] - dFinv2X[i]);
 
-	return dH;
+	dH = dH% (int)pow(2.0, m);
+	return val(dH, m);
 }
-/*
-double alg1(double *dK, double *dX, double *dY, Cipher *ciph)
+
+int alg1(int *dK, int *dX, int *dY, Cipher *ciph, int m)
 {
-	double dH[32];
-	double dJ[32];
-	double dHx, dHmax;
+	int dH[32];
+	int dJ[32];
+	int dHx, dHmax;
 	int imax;
 
 	for (int i = 0; i < 32; i++)
 		dJ[i] = 0;
 
-	dHx = H(dK, dX, dY, ciph);
+	dHx = H(dK, dX, dY, ciph, m);
 
 	//cout << "H* = " << dHx << endl;
 
 STEP2:
 	for(int i = 0; i < 32; i++)
 	{
-		if(dK[i] == 0.5)
+		if(dK[i] == 2)
 		{
-			double dH0, dH1;
+			int dH0, dH1;
 
-			dK[i] = 0.0;
-			dH0 = H(dK, dX, dY, ciph);
-			dK[i] = 1.0;
-			dH1 = H(dK, dX, dY, ciph);
+			dK[i] = 0;
+			dH0 = H(dK, dX, dY, ciph, m);
+			dK[i] = 1;
+			dH1 = H(dK, dX, dY, ciph, m);
 
 			if((dH0 < dHx)&&(dHx < dH1))
 			{
 				dH[i] = dH1;
-				dJ[i] = 1.0;
+				dJ[i] = 1;
 			}
 			else if((dH1 < dHx)&&(dHx < dH0))
 			{
 				dH[i] = dH0;
-				dJ[i] = 0.0;
+				dJ[i] = 0;
 			} 
 			else
 			{
 				dH[i] = dHx;
 			}
-			dK[i] = 0.5;
+			dK[i] = 2;
 		}
-		else if(dK[i] == 0.0)
+		else if(dK[i] == 0)
 		{
-			double dH05, dH1;
+			int dH05, dH1;
 
-			dK[i] = 0.5;
-			dH05 = H(dK, dX, dY, ciph);
-			dK[i] = 1.0;
-			dH1 = H(dK, dX, dY, ciph);
+			dK[i] = 2;
+			dH05 = H(dK, dX, dY, ciph, m);
+			dK[i] = 1;
+			dH1 = H(dK, dX, dY, ciph, m);
 
 			if((dH05 < dHx)&&(dHx < dH1))
 			{
 				dH[i] = dH1;
-				dJ[i] = 1.0;
+				dJ[i] = 1;
 			}
 			else if((dH1 < dHx)&&(dHx < dH05))
 			{
 				dH[i] = dH05;
-				dJ[i] = 0.5;
+				dJ[i] = 2;
 			} 
 			else
 			{
 				dH[i] = dHx;
 			}
-			dK[i] = 0.0;
+			dK[i] = 0;
 		}
-		else if(dK[i] == 1.0)
+		else if(dK[i] == 1)
 		{
-			double dH0, dH05;
+			int dH0, dH05;
 
-			dK[i] = 0.0;
-			dH0 = H(dK, dX, dY, ciph);
-			dK[i] = 0.5;
-			dH05 = H(dK, dX, dY, ciph);
+			dK[i] = 0;
+			dH0 = H(dK, dX, dY, ciph, m);
+			dK[i] = 2;
+			dH05 = H(dK, dX, dY, ciph, m);
 
 			if((dH0 < dHx)&&(dHx < dH05))
 			{
 				dH[i] = dH05;
-				dJ[i] = 0.5;
+				dJ[i] = 2;
 			}
 			else if((dH05 < dHx)&&(dHx < dH0))
 			{
 				dH[i] = dH0;
-				dJ[i] = 0.0;
+				dJ[i] = 0;
 			} 
 			else
 			{
 				dH[i] = dHx;
 			}
-			dK[i] = 1.0;
+			dK[i] = 1;
 		}
 	}
 
@@ -337,7 +355,7 @@ STEP2:
 
 	return dHmax;
 }
-*/
+/**/
 typedef struct p
 {
 	double p00, p10, p01, p11;
@@ -368,9 +386,9 @@ int main()
 	int dX[32];
 	int dY[32];
 
-	double dHx, dHmax;
+	int dHx, dHmax;
 	int j = 0;
-	int m = 10;
+	int m = 27;
 	probability P[32];
 
 	unsigned char ucX[5] = "\x22\x6f\x3e\x65";//"0000";
@@ -399,10 +417,11 @@ int main()
 	
 		ciph.CryptBlock(ucY,ucK);
 
-		//uctod(ucK, dK);
+		//uctoi(ucK, dK);
 		uctoi(ucK, dKK);
 		uctoi(ucX, dX);
 		uctoi(ucY, dY);
+
 		/*
 		cout << "-----------------K orig--------------" << endl;
 		for (int i = 0; i < 32; i++)
@@ -421,11 +440,11 @@ int main()
 			{
 				switch (rand()%100)
 				{
-				case 0: dK[i] = 0.0;
+				case 0: dK[i] = 0;
 					break;
-				case 1: dK[i] = 1.0;
+				case 1: dK[i] = 1;
 					break;
-				default: dK[i] = 0.5;
+				default: dK[i] = 2;
 					break;
 				}
 			}
@@ -442,7 +461,7 @@ int main()
 			//---------------------------------------------------------------------------------------
 
 
-		//	dHx = alg1(dK, dX, dY, &ciph);
+			dHx = alg1(dK, dX, dY, &ciph, m);
 
 
 			for (int i = 0; i < 32; i++)
@@ -496,9 +515,8 @@ int main()
 	if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-
-	/**/
-
+	/**/	
+	/*
 	cout << "-----------------Y-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -507,10 +525,20 @@ int main()
 	}	
 	cout << endl << endl;
 
-	H(dK, dX, dY, &ciph, m);
 	/**/
+	/*
+	cout << "-----------------X-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dX[i] << "\t";
+		if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
 
-	//cout << "H* = " << dHx << endl;
+	/**/
+	//dHx = H(dK, dX, dY, &ciph, m);
+
+	cout << "H* = " << dHx << endl;
 	
 	/*
 	double s[] = {1, 1, 1, 1};

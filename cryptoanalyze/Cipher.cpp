@@ -26,7 +26,7 @@ unsigned char *Cipher::CryptBlock(unsigned char* czInBlock, unsigned char* czKey
 		czInBlock = sub->SubstituteStr(czInBlock, 4);
 		czInBlock = per->PermutateBlock(czInBlock);
 	}
-
+	
 	for (int i = 0; i < 4; i++) czInBlock[i]^=czKeyBlock[i];
 	
 	return czInBlock;
