@@ -216,6 +216,60 @@ void uctod(unsigned char *ucX, double *dX)
 	}
 }
 
+double H(double *dK, double *dX, double *dY, Cipher *ciph)
+{
+	double dF2X[32];
+	double dFinv2X[32];
+
+	double dTemp[32];
+	double dH = 1.0;
+
+	for(int i = 0; i < 32; i++)
+		dF2X[i] = dX[i];
+
+	for(int c = 0; c < 2; c++)
+	{
+		Xor(dF2X, dK, 32);
+
+		for(int i = 0; i < 32; i+=4)
+			Sub(dF2X+i);
+		/**/
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dF2X[i];
+
+		for(int i = 0; i < 32; i++)
+			dF2X[ciph->per->pers[i]] = dTemp[i];
+		/**/
+	}
+
+	/**/
+	for(int i = 0; i < 32; i++)
+		dFinv2X[i] = dY[i];
+
+	Xor(dFinv2X, dK, 32);
+
+	for(int c = 0; c < 2; c++)
+	{
+		for(int i = 0; i < 32; i++)
+			dTemp[i] = dFinv2X[i];
+
+		for(int i = 0; i < 32; i++)
+			dFinv2X[ciph->per->pers_inv[i]] = dTemp[i];
+
+		for(int i = 0; i < 32; i+=4)
+			SubInv(dFinv2X+i);
+
+		Xor(dFinv2X, dK, 32);
+	}
+	/**/
+
+
+	for(int i = 0; i < 32; i++)
+		dH *= dF2X[i]*dFinv2X[i] + (1.0 - dF2X[i])*(1.0 - dFinv2X[i]);
+
+	return dH;
+}
+
 int main()
 {
 	srand (time(NULL));
@@ -236,22 +290,15 @@ int main()
 	cout << "Working.." << endl;
 
 	double dKK[32];
-	double dK[32] = {
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-		0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5
-	};
+	double dK[32];
 
 	double dX[32];
 	double dY[32];
-	double dTemp[32];
-	double dF2X[32];
-	double dFinv2X[32];
-	double dH[2] = {1.0, 1.0};
+	double dH[2];
 	double dHx;
 	int j = 0;
-	int r = 0;
+	int r = 17;
+	int iOpenBits[32];
 
 	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
 	unsigned char ucY[4];
@@ -276,114 +323,96 @@ int main()
 	cout << endl << endl;
 
 
+
 LOOP:
-	j = r;
 	dHx = pow(2.0, -32);
 
-	for (int i = 0; i < j; i++)
-		dK[i] = dKK[i];
+	for (int i = 0; i < 32; i++)
+		dK[i] = 0.5;
 
+	for(int k = 0; k < r; k++)
+	{
+		iOpenBits[k] = rand()%32;
+		for (int i = 0; i < k; i++)
+		{
+			if (iOpenBits[i] == iOpenBits[k]) {k--; break;}
+		}
+	}
+
+	for (int i = 0; i < r; i++)
+		dK[iOpenBits[i]] = dKK[iOpenBits[i]];
+
+	j = 0;
 	while (j < 32)
 	{
-		for(int k = 0; k < 2; k++)
+		if(dK[j] == 0.5)
 		{
-			dH[k] = 1.0;
-			if(k == 0) dK[j] = 0;
-			if(k == 1) dK[j] = 1;
-
-			for(int i = 0; i < 32; i++)
-				dF2X[i] = dX[i];
-
-			for(int c = 0; c < 2; c++)
+			for(int k = 0; k < 2; k++)
 			{
-				Xor(dF2X, dK, 32);
+				if(k == 0) dK[j] = 0.0;
+				if(k == 1) dK[j] = 1.0;
 
-				for(int i = 0; i < 32; i+=4)
-					Sub(dF2X+i);
-				/**/
-				for(int i = 0; i < 32; i++)
-					dTemp[i] = dF2X[i];
+				dH[k] = H(dK, dX, dY, &ciph);
 
-				for(int i = 0; i < 32; i++)
-					dF2X[ciph.per->pers[i]] = dTemp[i];
-				/**/
 			}
 
-			/**/
-			for(int i = 0; i < 32; i++)
-				dFinv2X[i] = dY[i];
+			if ((dH[0] < dHx)&&(dHx < dH[1])) {dHx = dH[1]; dK[j] = 1;}
+			else if ((dH[1] < dHx)&&(dHx < dH[0])) {dHx = dH[0]; dK[j] = 0;}
+			else {goto LOOP;}
 
-			Xor(dFinv2X, dK, 32);
-
-			for(int c = 0; c < 2; c++)
-			{
-				for(int i = 0; i < 32; i++)
-					dTemp[i] = dFinv2X[i];
-
-				for(int i = 0; i < 32; i++)
-					dFinv2X[ciph.per->pers_inv[i]] = dTemp[i];
-
-				for(int i = 0; i < 32; i+=4)
-					SubInv(dFinv2X+i);
-
-				Xor(dFinv2X, dK, 32);
-			}
-			/**/
-
-
-			for(int i = 0; i < 32; i++)
-				dH[k] *= dF2X[i]*dFinv2X[i] + (1.0 - dF2X[i])*(1.0 - dFinv2X[i]);
 		}
 
-		if ((dH[0] < dHx)&&(dHx < dH[1])) {dHx = dH[1]; dK[j] = 1;}
-		else if ((dH[1] < dHx)&&(dHx < dH[0])) {dHx = dH[0]; dK[j] = 0;}
-		else {dHx = 0; dK[j] = 0.5;}
-
 		j++;
-		if(dHx == 0) break;
-
 	}
-	if (dHx == 0) {r++; goto LOOP;}
 	
 	//---------------------------------------------------------------------------------------
 	
+	for (int i = 0; i < 32; i++)
+		if (dK[i] != dKK[i]) 
+		{
+			cout << "key not found" << endl;
+			cout << "----------opened-K-------------------" << endl;
+			for (int i = 0; i < 32; i++)
+			{	
+				cout << dK[i] << "\t";
+				if(!((i+1)%8)) cout << endl;
+			}	
+			cout << endl << endl;
+			
+			for (int i = 0; i < 32; i++)
+				dK[i] = 0.5;
+			for (int i = 0; i < r; i++)
+				dK[iOpenBits[i]] = dKK[iOpenBits[i]];
 
-	cout << "-----------------K-------------------" << endl;
+			cout << "---------initial-K-------------------" << endl;
+			for (int i = 0; i < 32; i++)
+			{	
+				cout << dK[i] << "\t";
+				if(!((i+1)%8)) cout << endl;
+			}	
+			cout << endl << endl;
+			cout << "H* = " << dHx << endl;
+			cout << "r  = " << r << endl;
+
+			_getch();
+			return 0;
+			break;	
+		}
+
+	cout << "key found" << endl;
+
+	for (int i = 0; i < 32; i++)
+		dK[i] = 0.5;
+	for (int i = 0; i < r; i++)
+		dK[iOpenBits[i]] = dKK[iOpenBits[i]];
+
+	cout << "---------initial-K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
 		cout << dK[i] << "\t";
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-	
-	/**/
-	/*
-	cout << "-----------------Y-------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dY[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
-	/**/
-	/*
-	cout << "-----------------F2------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dF2X[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-	
-	cout << "-----------------F-2-----------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dFinv2X[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
 	/**/
 
 	cout << "H* = " << dHx << endl;
