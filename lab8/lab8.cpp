@@ -243,6 +243,7 @@ STEP2:
 			{
 				dH[i] = dHx;
 			}
+			dK[i] = 0.5;
 		}
 		else if(dK[i] == 0.0)
 		{
@@ -267,7 +268,8 @@ STEP2:
 			{
 				dH[i] = dHx;
 			}
-		} 
+			dK[i] = 0.0;
+		}
 		else if(dK[i] == 1.0)
 		{
 			double dH0, dH05;
@@ -291,6 +293,7 @@ STEP2:
 			{
 				dH[i] = dHx;
 			}
+			dK[i] = 1.0;
 		}
 	}
 
@@ -313,7 +316,7 @@ STEP2:
 
 typedef struct p
 {
-	int p00, p10, p01, p11;
+	double p00, p10, p01, p11;
 } probability;
 
 int main()
@@ -336,12 +339,7 @@ int main()
 	cout << "Working.." << endl;
 
 	double dKK[32];
-	double dK[32] = {
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0
-	};
+	double dK[32];
 
 	double dX[32];
 	double dY[32];
@@ -350,27 +348,10 @@ int main()
 	int j = 0;
 	probability P[32];
 
-	unsigned char ucX[5] = "\xf5\x6f\x3e\x65";//"0000";
-	unsigned char ucY[4];
+	unsigned char ucX[5] = "\x22\x6f\x3e\x65";//"0000";
+	unsigned char ucY[5];
 	unsigned char ucK[5] = "\x73\x56\xa3\x64";
 
-	for(int i = 0; i < 4; i++)
-		ucY[i] = ucX[i];
-	
-	ciph.CryptBlock(ucY,ucK);
-
-	uctod(ucK, dK);
-	uctod(ucK, dKK);
-	uctod(ucX, dX);
-	uctod(ucY, dY);
-
-	cout << "-----------------K orig--------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dKK[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}
-	cout << endl << endl;
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -379,59 +360,109 @@ int main()
 		P[i].p10 = 0;
 		P[i].p11 = 0;
 	}
-	//---------------------------------------------------------------------------------------
 
-	for (int t = 0; t < 100; t++)
+	for (int i = 0; i < 100; i++)
 	{
-		
-		for (int i = 0; i < 32; i++)
+		for (int i = 0; i < 4; i++)
 		{
-			switch (rand()%100)
-			{
-			case 0: dK[i] = 0.0;
-				break;
-			case 1: dK[i] = 1.0;
-				break;
-			default: dK[i] = 0.5;
-				break;
-			}
+			ucK[i] = rand()%0x100;
+			//ucX[i] = rand()%0x100;
 		}
-		/**/
+
+		for(int i = 0; i < 4; i++)
+			ucY[i] = ucX[i];
+	
+		ciph.CryptBlock(ucY,ucK);
+
+		//uctod(ucK, dK);
+		uctod(ucK, dKK);
+		uctod(ucX, dX);
+		uctod(ucY, dY);
 		/*
-		cout << "-----------------K-------------------" << endl;
+		cout << "-----------------K orig--------------" << endl;
 		for (int i = 0; i < 32; i++)
 		{	
-			cout << dK[i] << "\t";
+			cout << dKK[i] << "\t";
 			if(!((i+1)%8)) cout << endl;
-		}	
+		}
 		cout << endl << endl;
 		/**/
 		//---------------------------------------------------------------------------------------
 
-
-		dHx = alg1(dK, dX, dY, &ciph);
-
-
-		for (int i = 0; i < 32; i++)
+		for (int t = 0; t < 100; t++)
 		{
-			if((dK[i] == 0.0)&&(dKK[i] == 0.0)) P[i].p00++;
-			if((dK[i] == 0.0)&&(dKK[i] == 1.0)) P[i].p01++;
-			if((dK[i] == 1.0)&&(dKK[i] == 0.0)) P[i].p10++;
-			if((dK[i] == 1.0)&&(dKK[i] == 1.0)) P[i].p11++;
-		}
-	}
+		
+			for (int i = 0; i < 32; i++)
+			{
+				switch (rand()%100)
+				{
+				case 0: dK[i] = 0.0;
+					break;
+				case 1: dK[i] = 1.0;
+					break;
+				default: dK[i] = 0.5;
+					break;
+				}
+			}
+			/**/
+			/*
+			cout << "-----------------K-------------------" << endl;
+			for (int i = 0; i < 32; i++)
+			{	
+				cout << dK[i] << "\t";
+				if(!((i+1)%8)) cout << endl;
+			}	
+			cout << endl << endl;
+			/**/
+			//---------------------------------------------------------------------------------------
 
-	//---------------------------------------------------------------------------------------
+
+			dHx = alg1(dK, dX, dY, &ciph);
+
+
+			for (int i = 0; i < 32; i++)
+			{
+				if((dK[i] == 0.0)&&(dKK[i] == 0.0)) P[i].p00++;
+				if((dK[i] == 1.0)&&(dKK[i] == 0.0)) P[i].p10++;
+				if((dK[i] == 0.0)&&(dKK[i] == 1.0)) P[i].p01++;
+				if((dK[i] == 1.0)&&(dKK[i] == 1.0)) P[i].p11++;
+				/*if(dK[i] != 0.5)
+				{
+					if (dK[i] == dKK[i]) P[i].p00++;
+					if (dK[i] != dKK[i]) P[i].p10++;
+				}*/
+
+			}
+		}
+		/**/
+		//---------------------------------------------------------------------------------------
+	}
 	
+	double temp;
 	for (int i = 0; i < 32; i++)
 	{
-		cout << P[i].p00 << " ";
-		cout << P[i].p01 << " ";
-		cout << P[i].p10 << " ";
+		temp = P[i].p00 + P[i].p10;
+		P[i].p00 = P[i].p00/temp;
+		P[i].p10 = P[i].p10/temp;
+
+		temp = P[i].p01 + P[i].p11;
+		P[i].p01 = P[i].p01/temp;
+		P[i].p11 = P[i].p11/temp;
+	}
+	/**/
+	cout << fixed ;
+	cout << setprecision(2);
+	for (int i = 0; i < 32; i++)
+	{
+		cout << P[i].p00 << "\t";
+		cout << P[i].p10 << "\t";
+		cout << P[i].p01 << "\t";
 		cout << P[i].p11 << endl;
 	}
 	cout << endl << endl;
+	cout.unsetf ( ios_base::fixed );  
 
+	/**/
 
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
@@ -441,34 +472,6 @@ int main()
 	}	
 	cout << endl << endl;
 	
-	/**/
-	/*
-	cout << "-----------------Y-------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dY[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
-	/**/
-	/*
-	cout << "-----------------F2------------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dF2X[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-	
-	cout << "-----------------F-2-----------------" << endl;
-	for (int i = 0; i < 32; i++)
-	{	
-		cout << dFinv2X[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
-	}	
-	cout << endl << endl;
-
 	/**/
 
 	cout << "H* = " << dHx << endl;

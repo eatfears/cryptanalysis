@@ -13,6 +13,7 @@
 #include <conio.h>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 
 #include "cryptoanalyze.h"
