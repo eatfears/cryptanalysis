@@ -5,36 +5,36 @@
 
 //((u1&&!u2&&u4) || (!u2&&u3&&!u4) || (u1&&!u3&&u4) || (!u2&&!u3&&u4) || (!u1&&u2&&!u3&&!u4) || (!u1&&u2&&u3&&u4))
 //v1 = u4 + u3 + u2 + u1*u3*u4 + u1*u2 + u1*u2*u3
-double V1(double u1, double u2, double u3, double u4)
+int V1(int u1, int u2, int u3, int u4, int m)
 {
-	double res;
-	res = abs( abs(abs(u4 - u3) - abs(u2 - u1*u3*u4)) - abs(u1*u2 - u1*u2*u3));
+	int res;
+	res = abs(abs(abs(u4 - u3) - abs(u2 - u1*u3*u4)) - abs(u1*u2 - u1*u2*u3));
 	return res;
 }
 
 //((!u1&&u3&&!u4) || (!u1&&u2&&u4) || (u1&&u3&&u4) || (u1&&!u2&&u4) || (u1&&u2&&!u3&&!u4))
 //v2 = u3 + u3*u4 + u2*u4 + u1*u4 + u1*u3 + u1*u3*u4 + u1*u2 + u1*u2*u4 + u1*u2*u3
-double V2(double u1, double u2, double u3, double u4)
+int V2(int u1, int u2, int u3, int u4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(abs(u3 - u3*u4) - abs(u2*u4 - u1*u4)) - abs(abs(abs(u1*u3 - u1*u3*u4) - abs(u1*u2 - u1*u2*u4)) - u1*u2*u3));
 	return res;
 }
 
 //((!u1&&!u2&&!u3) || (!u1&&u2&&u4) || (u1&&u2&&!u3) || (u1&&!u2&&u3&&u4) || (u1&&u2&&!u4))
 //v3 = 1 + u3 + u2 + u2*u4 + u2*u3 + u1 + u1*u3 + u1*u3*u4 + u1*u2*u4 + u1*u2*u3
-double V3(double u1, double u2, double u3, double u4)
+int V3(int u1, int u2, int u3, int u4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(abs(1 - u3) - abs(u2 - u2*u4)) - abs(abs(abs(u2*u3 - u1) - abs(u1*u3 - u1*u3*u4)) - abs(u1*u2*u4 - u1*u2*u3)));
 	return res;
 }
 
 //((u1&&u2&&u3) || (!u1&&!u2&&u3&&!u4) || (u1&&!u2&&!u3&&!u4) || (u1&&u3&&u4) || (!u1&&u2&&!u3) || (!u1&&!u3&&u4))
 //v4 = u4 + u3 + u2 + u2*u4 + u1
-double V4(double u1, double u2, double u3, double u4)
+int V4(int u1, int u2, int u3, int u4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(u4 - u3) - abs(abs(u2 - u2*u4) - u1));
 	return res;
 }
@@ -42,46 +42,46 @@ double V4(double u1, double u2, double u3, double u4)
 
 //((x1&&!x3&&!x4) || (!x1&&!x2&&x4) || (x1&&!x2&&!x4) || (!x1&&!x3&&x4) || (x1&&x2&&x3&&x4) || (!x1&&x2&&x3&&!x4))
 //u1 = v4 + v2*v3 + v1
-double U1(double v1, double v2, double v3, double v4)
+int U1(int v1, int v2, int v3, int v4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(v4 - v2*v3) - v1);
 	return res;
 }
 
 //((!x1&&x2) || (x1&&x3&&!x4) || (!x1&&!x2&&x3&&x4) || (x1&&!x2&&!x3&&x4))
 //u2 = v3*v4 + v2 + v2*v3*v4 + v1*v4 + v1*v3 + v1*v3*v4 + v1*v2 + v1*v2*v4
-double U2(double v1, double v2, double v3, double v4)
+int U2(int v1, int v2, int v3, int v4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(abs(v3*v4 - v2) - abs(v2*v3*v4 - v1*v4)) - abs(abs(v1*v3 - v1*v3*v4) - abs(v1*v2 - v1*v2*v4)));
 	return res;
 }
 
 //((x1&&x2&&x3) || (x2&&!x3&&x4) || (!x1&&!x3&&!x4) || (!x2&&!x3&&!x4) || (!x1&&!x2&&x3&&x4))
 //u3 = 1 + v4 + v3 + v2*v4 + v1*v3*v4 + v1*v2 + v1*v2*v4
-double U3(double v1, double v2, double v3, double v4)
+int U3(int v1, int v2, int v3, int v4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(abs(1 - v4) - abs(v3 - v2*v4)) - abs(abs(v1*v3*v4 - v1*v2) - v1*v2*v4));
 	return res;
 }
 
 //((x1&&x3) || (!x1&&x2&&x4) || (x1&&x2&&!x3&&!x4) || (!x1&&!x2&&!x3&&!x4))
 //u4 = 1 + v4 + v3 + v3*v4 + v2 + v2*v3 + v2*v3*v4 + v1 + v1*v4 + v1*v3*v4 + v1*v2*v4
-double U4(double v1, double v2, double v3, double v4)
+int U4(int v1, int v2, int v3, int v4, int m)
 {
-	double res;
+	int res;
 	res = abs(abs(abs(abs(1 - v4) - abs(v3 - v3*v4)) - abs(abs(v2 - v2*v3) - abs(v2*v3*v4 - v1))) - abs(abs(v1*v4 - v1*v3*v4) - v1*v2*v4));
 	return res;
 }
 
-void Sub(double *u)
+void Sub(int *u, int m)
 {
-	double temp1 = V1(u[0],u[1],u[2],u[3]);
-	double temp2 = V2(u[0],u[1],u[2],u[3]);
-	double temp3 = V3(u[0],u[1],u[2],u[3]);
-	double temp4 = V4(u[0],u[1],u[2],u[3]);
+	int temp1 = V1(u[0],u[1],u[2],u[3], m);
+	int temp2 = V2(u[0],u[1],u[2],u[3], m);
+	int temp3 = V3(u[0],u[1],u[2],u[3], m);
+	int temp4 = V4(u[0],u[1],u[2],u[3], m);
 
 	u[0] = temp1;
 	u[1] = temp2;
@@ -90,12 +90,12 @@ void Sub(double *u)
 
 }
 
-void SubInv(double *v)
+void SubInv(int *v, int m)
 {
-	double temp1 = U1(v[0],v[1],v[2],v[3]);
-	double temp2 = U2(v[0],v[1],v[2],v[3]);
-	double temp3 = U3(v[0],v[1],v[2],v[3]);
-	double temp4 = U4(v[0],v[1],v[2],v[3]);
+	int temp1 = U1(v[0],v[1],v[2],v[3], m);
+	int temp2 = U2(v[0],v[1],v[2],v[3], m);
+	int temp3 = U3(v[0],v[1],v[2],v[3], m);
+	int temp4 = U4(v[0],v[1],v[2],v[3], m);
 
 	v[0] = temp1;
 	v[1] = temp2;
@@ -103,18 +103,27 @@ void SubInv(double *v)
 	v[3] = temp4;
 }
 
-double Xor(double x, double k)
+int absmod(int x, int m)
 {
-	return abs(x - k);
+	int res = abs(x);
+
+	res = res% (int)pow(2.0, m);
+
+	return res;
 }
 
-void Xor(double *x, double *k, int size)
+int Xor(int x, int k, int m)
+{
+	return absmod(x - k, m);
+}
+
+void Xor(int *x, int *k, int size, int m)
 {
 	for (int i = 0; i < size; i++)
-		x[i] = Xor(x[i],k[i]);
+		x[i] = Xor(x[i],k[i], m);
 }
 
-void dtouc(double *dX, unsigned char *ucX)
+void dtouc(int *dX, unsigned char *ucX)
 {
 	unsigned char ucTemp;
 
@@ -132,7 +141,7 @@ void dtouc(double *dX, unsigned char *ucX)
 	}
 }
 
-void uctod(unsigned char *ucX, double *dX)
+void uctoi(unsigned char *ucX, int *dX)
 {
 	unsigned char ucTemp;
 
@@ -150,23 +159,38 @@ void uctod(unsigned char *ucX, double *dX)
 	}
 }
 
-double H(double *dK, double *dX, double *dY, Cipher *ciph)
+int val(int x, int m)
 {
-	double dF2X[32];
-	double dFinv2X[32];
+	x = x% (int)pow(2.0, m);
+	if(x == 0) return -m;
 
-	double dTemp[32];
-	double dH = 1.0;
+	int res = 0;
+
+	while(!(x%2))
+	{
+		res--;
+		x/=2;
+	}
+	return res;
+}
+
+int H(int *dK, int *dX, int *dY, Cipher *ciph, int m)
+{
+	int dF2X[32];
+	int dFinv2X[32];
+
+	int dTemp[32];
+	int dH = 1.0;
 
 	for(int i = 0; i < 32; i++)
 		dF2X[i] = dX[i];
 
 	for(int c = 0; c < 2; c++)
 	{
-		Xor(dF2X, dK, 32);
+		Xor(dF2X, dK, 32, m);
 
 		for(int i = 0; i < 32; i+=4)
-			Sub(dF2X+i);
+			Sub(dF2X+i, m);
 		/**/
 		for(int i = 0; i < 32; i++)
 			dTemp[i] = dF2X[i];
@@ -180,7 +204,7 @@ double H(double *dK, double *dX, double *dY, Cipher *ciph)
 	for(int i = 0; i < 32; i++)
 		dFinv2X[i] = dY[i];
 
-	Xor(dFinv2X, dK, 32);
+	Xor(dFinv2X, dK, 32, m);
 
 	for(int c = 0; c < 2; c++)
 	{
@@ -191,9 +215,9 @@ double H(double *dK, double *dX, double *dY, Cipher *ciph)
 			dFinv2X[ciph->per->pers_inv[i]] = dTemp[i];
 
 		for(int i = 0; i < 32; i+=4)
-			SubInv(dFinv2X+i);
+			SubInv(dFinv2X+i, m);
 
-		Xor(dFinv2X, dK, 32);
+		Xor(dFinv2X, dK, 32, m);
 	}
 	/**/
 
@@ -202,7 +226,7 @@ double H(double *dK, double *dX, double *dY, Cipher *ciph)
 
 	return dH;
 }
-
+/*
 double alg1(double *dK, double *dX, double *dY, Cipher *ciph)
 {
 	double dH[32];
@@ -313,7 +337,7 @@ STEP2:
 
 	return dHmax;
 }
-
+*/
 typedef struct p
 {
 	double p00, p10, p01, p11;
@@ -338,14 +362,15 @@ int main()
 	//cout << ciph.PrintPermutation();
 	cout << "Working.." << endl;
 
-	double dKK[32];
-	double dK[32];
+	int dKK[32];
+	int dK[32];
 
-	double dX[32];
-	double dY[32];
+	int dX[32];
+	int dY[32];
 
 	double dHx, dHmax;
 	int j = 0;
+	int m = 10;
 	probability P[32];
 
 	unsigned char ucX[5] = "\x22\x6f\x3e\x65";//"0000";
@@ -375,9 +400,9 @@ int main()
 		ciph.CryptBlock(ucY,ucK);
 
 		//uctod(ucK, dK);
-		uctod(ucK, dKK);
-		uctod(ucX, dX);
-		uctod(ucY, dY);
+		uctoi(ucK, dKK);
+		uctoi(ucX, dX);
+		uctoi(ucY, dY);
 		/*
 		cout << "-----------------K orig--------------" << endl;
 		for (int i = 0; i < 32; i++)
@@ -417,7 +442,7 @@ int main()
 			//---------------------------------------------------------------------------------------
 
 
-			dHx = alg1(dK, dX, dY, &ciph);
+		//	dHx = alg1(dK, dX, dY, &ciph);
 
 
 			for (int i = 0; i < 32; i++)
@@ -463,18 +488,29 @@ int main()
 	cout.unsetf ( ios_base::fixed );  
 
 	/**/
-
+	/*
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
-		cout << dK[i] << "\t";
+	cout << dK[i] << "\t";
+	if(!((i+1)%8)) cout << endl;
+	}	
+	cout << endl << endl;
+
+	/**/
+
+	cout << "-----------------Y-------------------" << endl;
+	for (int i = 0; i < 32; i++)
+	{	
+		cout << dY[i] << "\t";
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-	
+
+	H(dK, dX, dY, &ciph, m);
 	/**/
 
-	cout << "H* = " << dHx << endl;
+	//cout << "H* = " << dHx << endl;
 	
 	/*
 	double s[] = {1, 1, 1, 1};
