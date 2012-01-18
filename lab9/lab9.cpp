@@ -209,7 +209,6 @@ int H(int dK[32], int *dX, int *dY, Cipher *ciph, int m)
 	cout << endl << endl;
 
 	/**/
-	/**/
 	for(int i = 0; i < 32; i++)
 		dFinv2X[i] = dY[i];
 
@@ -382,6 +381,7 @@ int main()
 
 	int dKK[32];
 	int dK[32];
+	int dKs[32];
 
 	int dX[32];
 	int dY[32];
@@ -390,6 +390,7 @@ int main()
 	int j = 0;
 	int m = 27;
 	probability P[32];
+	probability Q[32];
 
 	unsigned char ucX[5] = "\x22\x6f\x3e\x65";//"0000";
 	unsigned char ucY[5];
@@ -403,13 +404,25 @@ int main()
 		P[i].p10 = 0;
 		P[i].p11 = 0;
 	}
-
-	for (int i = 0; i < 100; i++)
+	
+	for (int i = 0; i < 32; i++)
+	{
+		switch (i)//rand()%50)
+		{
+		case 0: dKs[i] = 0;
+			break;
+		case 1: dKs[i] = 1;
+			break;
+		default: dKs[i] = 2;
+			break;
+		}
+	}
+	/**/
+	for (int i = 0; i < 10000; i++)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			ucK[i] = rand()%0x100;
-			//ucX[i] = rand()%0x100;
 		}
 
 		for(int i = 0; i < 4; i++)
@@ -433,12 +446,14 @@ int main()
 		/**/
 		//---------------------------------------------------------------------------------------
 
-		for (int t = 0; t < 100; t++)
+		for (int t = 0; t < 1; t++)
 		{
 		
 			for (int i = 0; i < 32; i++)
 			{
-				switch (rand()%100)
+				dK[i] = dKs[i];
+				/*
+				switch (rand()%50)
 				{
 				case 0: dK[i] = 0;
 					break;
@@ -447,8 +462,8 @@ int main()
 				default: dK[i] = 2;
 					break;
 				}
+				/**/
 			}
-			/**/
 			/*
 			cout << "-----------------K-------------------" << endl;
 			for (int i = 0; i < 32; i++)
@@ -485,6 +500,14 @@ int main()
 	double temp;
 	for (int i = 0; i < 32; i++)
 	{
+		temp = P[i].p00 + P[i].p01;
+		Q[i].p00 = P[i].p00/temp;
+		Q[i].p10 = P[i].p01/temp;
+
+		temp = P[i].p10 + P[i].p11;
+		Q[i].p01 = P[i].p10/temp;
+		Q[i].p11 = P[i].p11/temp;
+
 		temp = P[i].p00 + P[i].p10;
 		P[i].p00 = P[i].p00/temp;
 		P[i].p10 = P[i].p10/temp;
@@ -498,10 +521,20 @@ int main()
 	cout << setprecision(2);
 	for (int i = 0; i < 32; i++)
 	{
+		cout << i << "\t";
 		cout << P[i].p00 << "\t";
 		cout << P[i].p10 << "\t";
 		cout << P[i].p01 << "\t";
 		cout << P[i].p11 << endl;
+	}
+	cout << endl << endl;
+	for (int i = 0; i < 32; i++)
+	{
+		cout << i << "\t";
+		cout << Q[i].p00 << "\t";
+		cout << Q[i].p10 << "\t";
+		cout << Q[i].p01 << "\t";
+		cout << Q[i].p11 << endl;
 	}
 	cout << endl << endl;
 	cout.unsetf ( ios_base::fixed );  

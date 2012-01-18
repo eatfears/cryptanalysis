@@ -8,7 +8,7 @@
 double V1(double u1, double u2, double u3, double u4)
 {
 	double res;
-	res = abs( abs(abs(u4 - u3) - abs(u2 - u1*u3*u4)) - abs(u1*u2 - u1*u2*u3));
+	res = abs(abs(u2*abs(1 - u1*abs(1 - u3)) - u3*abs(1 - u1*u4)) - u4);
 	return res;
 }
 
@@ -17,7 +17,7 @@ double V1(double u1, double u2, double u3, double u4)
 double V2(double u1, double u2, double u3, double u4)
 {
 	double res;
-	res = abs(abs(abs(u3 - u3*u4) - abs(u2*u4 - u1*u4)) - abs(abs(abs(u1*u3 - u1*u3*u4) - abs(u1*u2 - u1*u2*u4)) - u1*u2*u3));
+	res = abs(abs(u3*abs(1 - u4) - u4*abs(u2 - u1)) - u1*abs(abs(1 - u4)*abs(u3 - u2) - u2*u3));
 	return res;
 }
 
@@ -26,7 +26,7 @@ double V2(double u1, double u2, double u3, double u4)
 double V3(double u1, double u2, double u3, double u4)
 {
 	double res;
-	res = abs(abs(abs(1 - u3) - abs(u2 - u2*u4)) - abs(abs(abs(u2*u3 - u1) - abs(u1*u3 - u1*u3*u4)) - abs(u1*u2*u4 - u1*u2*u3)));
+	res = abs(abs(abs(1 - u3) - u2*abs(1 - u4)) - abs(u1*abs(u2*abs(u4 - u3) - u3*abs(1 - u4)) - abs(u2*u3 - u1)));
 	return res;
 }
 
@@ -35,7 +35,7 @@ double V3(double u1, double u2, double u3, double u4)
 double V4(double u1, double u2, double u3, double u4)
 {
 	double res;
-	res = abs(abs(u4 - u3) - abs(abs(u2 - u2*u4) - u1));
+	res = abs(abs(u4 - u3) - abs(u2*abs(1 - u4) - u1));
 	return res;
 }
 
@@ -54,7 +54,7 @@ double U1(double v1, double v2, double v3, double v4)
 double U2(double v1, double v2, double v3, double v4)
 {
 	double res;
-	res = abs(abs(abs(v3*v4 - v2) - abs(v2*v3*v4 - v1*v4)) - abs(abs(v1*v3 - v1*v3*v4) - abs(v1*v2 - v1*v2*v4)));
+	res = abs(abs(v3*v4*abs(1 - v2) - abs(v2 - v1*v4)) - v1*abs(1 - v4)*abs(v3 - v2));
 	return res;
 }
 
@@ -63,7 +63,7 @@ double U2(double v1, double v2, double v3, double v4)
 double U3(double v1, double v2, double v3, double v4)
 {
 	double res;
-	res = abs(abs(abs(1 - v4) - abs(v3 - v2*v4)) - abs(abs(v1*v3*v4 - v1*v2) - v1*v2*v4));
+	res = abs(abs(abs(1 - v3) - v4*abs(1 - v2)) - v1*abs(v2*abs(1 - v4) - v3*v4));
 	return res;
 }
 
@@ -72,7 +72,7 @@ double U3(double v1, double v2, double v3, double v4)
 double U4(double v1, double v2, double v3, double v4)
 {
 	double res;
-	res = abs(abs(abs(abs(1 - v4) - abs(v3 - v3*v4)) - abs(abs(v2 - v2*v3) - abs(v2*v3*v4 - v1))) - abs(abs(v1*v4 - v1*v3*v4) - v1*v2*v4));
+	res = abs(abs(abs(1 - v4)*abs(1 - v3) - abs(v2*abs(1 - v3) - abs(v2*v3*v4 - v1))) - v1*v4*abs(abs(1 - v3) - v2));
 	return res;
 }
 
@@ -340,6 +340,7 @@ int main()
 
 	double dKK[32];
 	double dK[32];
+	double dKs[32];
 
 	double dX[32];
 	double dY[32];
@@ -347,6 +348,7 @@ int main()
 	double dHx, dHmax;
 	int j = 0;
 	probability P[32];
+	probability Q[32];
 
 	unsigned char ucX[5] = "\x22\x6f\x3e\x65";//"0000";
 	unsigned char ucY[5];
@@ -361,7 +363,21 @@ int main()
 		P[i].p11 = 0;
 	}
 
-	for (int i = 0; i < 100; i++)
+
+	for (int i = 0; i < 32; i++)
+	{
+		switch (rand()%50)
+		{
+		case 0: dKs[i] = 0.0;
+			break;
+		case 1: dKs[i] = 1.0;
+			break;
+		default: dKs[i] = 0.5;
+			break;
+		}
+	}
+	/**/
+	for (int i = 0; i < 1000; i++)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -386,15 +402,18 @@ int main()
 			if(!((i+1)%8)) cout << endl;
 		}
 		cout << endl << endl;
+
 		/**/
 		//---------------------------------------------------------------------------------------
 
-		for (int t = 0; t < 100; t++)
+		for (int t = 0; t < 1; t++)
 		{
 		
 			for (int i = 0; i < 32; i++)
 			{
-				switch (rand()%100)
+				dK[i] = dKs[i];
+				/*
+				switch (rand()%50)
 				{
 				case 0: dK[i] = 0.0;
 					break;
@@ -403,8 +422,8 @@ int main()
 				default: dK[i] = 0.5;
 					break;
 				}
+				/**/
 			}
-			/**/
 			/*
 			cout << "-----------------K-------------------" << endl;
 			for (int i = 0; i < 32; i++)
@@ -416,9 +435,7 @@ int main()
 			/**/
 			//---------------------------------------------------------------------------------------
 
-
 			dHx = alg1(dK, dX, dY, &ciph);
-
 
 			for (int i = 0; i < 32; i++)
 			{
@@ -441,6 +458,14 @@ int main()
 	double temp;
 	for (int i = 0; i < 32; i++)
 	{
+		temp = P[i].p00 + P[i].p01;
+		Q[i].p00 = P[i].p00/temp;
+		Q[i].p10 = P[i].p01/temp;
+
+		temp = P[i].p10 + P[i].p11;
+		Q[i].p01 = P[i].p10/temp;
+		Q[i].p11 = P[i].p11/temp;
+
 		temp = P[i].p00 + P[i].p10;
 		P[i].p00 = P[i].p00/temp;
 		P[i].p10 = P[i].p10/temp;
@@ -454,10 +479,20 @@ int main()
 	cout << setprecision(2);
 	for (int i = 0; i < 32; i++)
 	{
+		cout << i << "\t";
 		cout << P[i].p00 << "\t";
 		cout << P[i].p10 << "\t";
 		cout << P[i].p01 << "\t";
 		cout << P[i].p11 << endl;
+	}
+	cout << endl << endl;
+	for (int i = 0; i < 32; i++)
+	{
+		cout << i << "\t";
+		cout << Q[i].p00 << "\t";
+		cout << Q[i].p10 << "\t";
+		cout << Q[i].p01 << "\t";
+		cout << Q[i].p11 << endl;
 	}
 	cout << endl << endl;
 	cout.unsetf ( ios_base::fixed );  
@@ -471,7 +506,7 @@ int main()
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-	
+
 	/**/
 
 	cout << "H* = " << dHx << endl;
