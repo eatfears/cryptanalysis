@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<logic-system name="New set">
+    <view-options>
+        <cards-settings />
+    </view-options>
+    <text># Entered by truth table
+
+$INORDER = x1, x2, x3, x4;
+$FNORDER = y1, y2, y3, y4, v1, v2, v3, v4;
+
+y1 = (x1|x2|x3|x4)&amp;(x1|x2|~x3|~x4)&amp;(x1|~x2|x3|~x4)&amp;(x1|~x2|~x3|x4)&amp;(~x1|x2|x3|x4)&amp;(~x1|~x2|x3|x4)&amp;(~x1|~x2|~x3|x4)&amp;(~x1|~x2|~x3|~x4);
+y2 = (x1|x2|x3|x4)&amp;(x1|x2|x3|~x4)&amp;(x1|x2|~x3|~x4)&amp;(x1|~x2|x3|x4)&amp;(~x1|x2|x3|x4)&amp;(~x1|x2|~x3|x4)&amp;(~x1|~x2|x3|~x4)&amp;(~x1|~x2|~x3|x4);
+y3 = (x1|x2|~x3|x4)&amp;(x1|x2|~x3|~x4)&amp;(x1|~x2|x3|x4)&amp;(x1|~x2|~x3|x4)&amp;(~x1|x2|x3|x4)&amp;(~x1|x2|x3|~x4)&amp;(~x1|x2|~x3|x4)&amp;(~x1|~x2|~x3|~x4);
+y4 = (x1|x2|x3|x4)&amp;(x1|x2|~x3|~x4)&amp;(x1|~x2|~x3|x4)&amp;(x1|~x2|~x3|~x4)&amp;(~x1|x2|x3|~x4)&amp;(~x1|x2|~x3|x4)&amp;(~x1|~x2|x3|x4)&amp;(~x1|~x2|x3|~x4);
+v1 = (x1|x2|x3|x4)&amp;(x1|x2|~x3|x4)&amp;(x1|~x2|x3|x4)&amp;(x1|~x2|~x3|~x4)&amp;(~x1|x2|x3|~x4)&amp;(~x1|x2|~x3|~x4)&amp;(~x1|~x2|x3|~x4)&amp;(~x1|~x2|~x3|x4);
+v2 = (x1|x2|x3|x4)&amp;(x1|x2|x3|~x4)&amp;(x1|x2|~x3|x4)&amp;(~x1|x2|x3|x4)&amp;(~x1|x2|~x3|~x4)&amp;(~x1|~x2|x3|x4)&amp;(~x1|~x2|x3|~x4)&amp;(~x1|~x2|~x3|~x4);
+v3 = (x1|x2|x3|~x4)&amp;(x1|x2|~x3|x4)&amp;(x1|~x2|~x3|x4)&amp;(x1|~x2|~x3|~x4)&amp;(~x1|x2|x3|~x4)&amp;(~x1|x2|~x3|x4)&amp;(~x1|x2|~x3|~x4)&amp;(~x1|~x2|x3|x4);
+v4 = (x1|x2|x3|~x4)&amp;(x1|x2|~x3|x4)&amp;(x1|x2|~x3|~x4)&amp;(x1|~x2|x3|x4)&amp;(x1|~x2|~x3|x4)&amp;(~x1|x2|x3|x4)&amp;(~x1|x2|x3|~x4)&amp;(~x1|~x2|x3|~x4);</text>
+    <vars>
+        <var>x1</var>
+        <var>x2</var>
+        <var>x3</var>
+        <var>x4</var>
+    </vars>
+    <coverage-sets>
+        <coverage-set name="Coverage by 0" cover-by="0">
+            <coverages function="y1">
+                <coverage>~x1, x3, x4</coverage>
+                <coverage>~x1, ~x2, ~x3</coverage>
+                <coverage>x1, x2, x3, x4</coverage>
+                <coverage>x1, ~x2, x3, ~x4</coverage>
+                <coverage>x1, x2, ~x3, ~x4</coverage>
+                <coverage>x1, ~x2, ~x3, x4</coverage>
+            </coverages>
+            <coverages function="y2" />
+            <coverages function="y3" />
+            <coverages function="y4" />
+            <coverages function="v1" />
+            <coverages function="v2" />
+            <coverages function="v3" />
+            <coverages function="v4" />
+        </coverage-set>
+        <coverage-set name="Coverage by 1" cover-by="1">
+            <coverages function="y1">
+                <coverage>x1, ~x2, x4</coverage>
+                <coverage>~x2, x3, ~x4</coverage>
+                <coverage>x1, ~x3, x4</coverage>
+                <coverage>~x2, ~x3, x4</coverage>
+                <coverage>~x1, x2, ~x3, ~x4</coverage>
+                <coverage>~x1, x2, x3, x4</coverage>
+            </coverages>
+            <coverages function="y2">
+                <coverage>~x1, x3, ~x4</coverage>
+                <coverage>~x1, x2, x4</coverage>
+                <coverage>x1, x3, x4</coverage>
+                <coverage>x1, ~x2, x4</coverage>
+                <coverage>x1, x2, ~x3, ~x4</coverage>
+            </coverages>
+            <coverages function="y3">
+                <coverage>~x1, ~x2, ~x3</coverage>
+                <coverage>~x1, x2, x4</coverage>
+                <coverage>x1, x2, ~x3</coverage>
+                <coverage>x1, ~x2, x3, x4</coverage>
+                <coverage>x1, x2, ~x4</coverage>
+            </coverages>
+            <coverages function="y4">
+                <coverage>x1, x2, x3</coverage>
+                <coverage>~x1, ~x2, x3, ~x4</coverage>
+                <coverage>x1, ~x2, ~x3, ~x4</coverage>
+                <coverage>x1, x3, x4</coverage>
+                <coverage>~x1, x2, ~x3</coverage>
+                <coverage>~x1, ~x3, x4</coverage>
+            </coverages>
+            <coverages function="v1">
+                <coverage>x1, ~x3, ~x4</coverage>
+                <coverage>~x1, ~x2, x4</coverage>
+                <coverage>x1, ~x2, ~x4</coverage>
+                <coverage>~x1, ~x3, x4</coverage>
+                <coverage>x1, x2, x3, x4</coverage>
+                <coverage>~x1, x2, x3, ~x4</coverage>
+            </coverages>
+            <coverages function="v2">
+                <coverage>~x1, x2</coverage>
+                <coverage>x1, x3, ~x4</coverage>
+                <coverage>~x1, ~x2, x3, x4</coverage>
+                <coverage>x1, ~x2, ~x3, x4</coverage>
+            </coverages>
+            <coverages function="v3">
+                <coverage>x1, x2, x3</coverage>
+                <coverage>x2, ~x3, x4</coverage>
+                <coverage>~x1, ~x3, ~x4</coverage>
+                <coverage>~x2, ~x3, ~x4</coverage>
+                <coverage>~x1, ~x2, x3, x4</coverage>
+            </coverages>
+            <coverages function="v4">
+                <coverage>x1, x3</coverage>
+                <coverage>~x1, x2, x4</coverage>
+                <coverage>x1, x2, ~x3, ~x4</coverage>
+                <coverage>~x1, ~x2, ~x3, ~x4</coverage>
+            </coverages>
+        </coverage-set>
+    </coverage-sets>
+    <functions>
+        <function name="y1">
+            <values>0,1,1,0,1,0,0,1,0,1,1,1,0,1,0,0</values>
+        </function>
+        <function name="y2">
+            <values>0,0,1,0,0,1,1,1,0,1,0,1,1,0,0,1</values>
+        </function>
+        <function name="y3">
+            <values>1,1,0,0,0,1,0,1,0,0,0,1,1,1,1,0</values>
+        </function>
+        <function name="y4">
+            <values>0,1,1,0,1,1,0,0,1,0,0,1,0,0,1,1</values>
+        </function>
+        <function name="v1">
+            <values>0,1,0,1,0,1,1,0,1,0,1,0,1,0,0,1</values>
+        </function>
+        <function name="v2">
+            <values>0,0,0,1,1,1,1,1,0,1,1,0,0,0,1,0</values>
+        </function>
+        <function name="v3">
+            <values>1,0,0,1,1,1,0,0,1,0,0,0,0,1,1,1</values>
+        </function>
+        <function name="v4">
+            <values>1,0,0,0,0,1,0,1,0,0,1,1,1,0,1,1</values>
+        </function>
+    </functions>
+</logic-system>
