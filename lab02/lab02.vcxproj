@@ -72,7 +72,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\cryptoanalyze\Substitution.cpp" />
-    <ClCompile Include="lab2.cpp" />
+    <ClCompile Include="lab02.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
