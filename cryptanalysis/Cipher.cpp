@@ -1,4 +1,4 @@
-#include "cryptoanalyze.h"
+#include "cryptanalysis.h"
 #include <algorithm>
 #include <iostream>
 #include <math.h>

@@ -15,6 +15,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "cryptoanalyze.h"
+#include "cryptanalysis.h"
 
 using namespace std;

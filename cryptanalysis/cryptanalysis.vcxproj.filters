@@ -31,10 +31,10 @@
     <ClInclude Include="Substitution.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="cryptoanalyze.h">
+    <ClInclude Include="Cipher.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Cipher.h">
+    <ClInclude Include="cryptanalysis.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,5 +1,5 @@
 //Permutation.cpp
-#include "cryptoanalyze.h"
+#include "cryptanalysis.h"
 
 using namespace std;
 

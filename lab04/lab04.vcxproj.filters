@@ -9,7 +9,7 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="cryptoanalyze">
+    <Filter Include="cryptanalysis">
       <UniqueIdentifier>{cb3b8fe3-39b5-4432-960d-add4f902371d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -22,17 +22,17 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="..\cryptoanalyze\Substitution.cpp">
-      <Filter>cryptoanalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cryptoanalyze\Permutation.cpp">
-      <Filter>cryptoanalyze</Filter>
-    </ClCompile>
-    <ClCompile Include="..\cryptoanalyze\Cipher.cpp">
-      <Filter>cryptoanalyze</Filter>
-    </ClCompile>
     <ClCompile Include="lab04.cpp">
       <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cryptanalysis\Substitution.cpp">
+      <Filter>cryptanalysis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cryptanalysis\Cipher.cpp">
+      <Filter>cryptanalysis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cryptanalysis\Permutation.cpp">
+      <Filter>cryptanalysis</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

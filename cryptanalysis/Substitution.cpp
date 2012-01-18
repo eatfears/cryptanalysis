@@ -1,5 +1,5 @@
 //Substitution.cpp
-#include "cryptoanalyze.h"
+#include "cryptanalysis.h"
 #include <math.h>
 #include <time.h>
 #include <array>
