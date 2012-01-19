@@ -1,7 +1,9 @@
 //lab08.cpp
 #include "stdafx.h"
 
-#define ROUND(x)	(x>0.5?1:0)
+#define ROUND(x)				(x>0.5?1:0)
+#define NUMBER_OF_KEY			10
+#define ROUND_PER_KEY			1000
 
 //((u1&&!u2&&u4) || (!u2&&u3&&!u4) || (u1&&!u3&&u4) || (!u2&&!u3&&u4) || (!u1&&u2&&!u3&&!u4) || (!u1&&u2&&u3&&u4))
 //v1 = u4 + u3 + u2 + u1*u3*u4 + u1*u2 + u1*u2*u3
@@ -340,7 +342,7 @@ int main()
 
 	double dKK[32];
 	double dK[32];
-	double dKs[32];
+	double dKs[ROUND_PER_KEY][32];
 
 	double dX[32];
 	double dY[32];
@@ -363,21 +365,21 @@ int main()
 		P[i].p11 = 0;
 	}
 
-
-	for (int i = 0; i < 32; i++)
-	{
-		switch (rand()%50)
+	for (int j = 0; j < ROUND_PER_KEY; j++)
+		for (int i = 0; i < 32; i++)
 		{
-		case 0: dKs[i] = 0.0;
-			break;
-		case 1: dKs[i] = 1.0;
-			break;
-		default: dKs[i] = 0.5;
-			break;
+			switch (rand()%5)
+			{
+			case 0: dKs[j][i] = 0.0;
+				break;
+			case 1: dKs[j][i] = 1.0;
+				break;
+			default: dKs[j][i] = 0.5;
+				break;
+			}
 		}
-	}
 	/**/
-	for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < NUMBER_OF_KEY; i++)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -406,12 +408,12 @@ int main()
 		/**/
 		//---------------------------------------------------------------------------------------
 
-		for (int t = 0; t < 1; t++)
+		for (int t = 0; t < ROUND_PER_KEY; t++)
 		{
 		
 			for (int i = 0; i < 32; i++)
 			{
-				dK[i] = dKs[i];
+				dK[i] = dKs[t][i];
 				/*
 				switch (rand()%50)
 				{
@@ -455,6 +457,18 @@ int main()
 		//---------------------------------------------------------------------------------------
 	}
 	
+	cout << "\tN00\tN10\tN01\tN11" << endl ;
+	cout << fixed ;
+	cout << setprecision(2);
+	for (int i = 0; i < 32; i++)
+	{
+		cout << i << "\t";
+		cout << P[i].p00 << "\t";
+		cout << P[i].p10 << "\t";
+		cout << P[i].p01 << "\t";
+		cout << P[i].p11 << endl;
+	}
+
 	double temp;
 	for (int i = 0; i < 32; i++)
 	{
@@ -475,8 +489,8 @@ int main()
 		P[i].p11 = P[i].p11/temp;
 	}
 	/**/
-	cout << fixed ;
-	cout << setprecision(2);
+	cout << endl << endl;
+	cout << "\tp00\tp10\tp01\tp11" << endl ;
 	for (int i = 0; i < 32; i++)
 	{
 		cout << i << "\t";
@@ -486,6 +500,7 @@ int main()
 		cout << P[i].p11 << endl;
 	}
 	cout << endl << endl;
+	cout << "\tq00\tq10\tq01\tq11" << endl ;
 	for (int i = 0; i < 32; i++)
 	{
 		cout << i << "\t";
@@ -497,8 +512,7 @@ int main()
 	cout << endl << endl;
 	cout.unsetf ( ios_base::fixed );  
 
-	/**/
-
+	/*
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
@@ -506,16 +520,12 @@ int main()
 		if(!((i+1)%8)) cout << endl;
 	}	
 	cout << endl << endl;
-
 	/**/
-
-	cout << "H* = " << dHx << endl;
-	
+	//cout << "H* = " << dHx << endl;
 	/*
 	double s[] = {1, 1, 1, 1};
 	SubInv(s);
 	cout << s[0] << s[1] << s[2] << s[3] << endl << endl;
-
 	
 	for (int i = 0; i < 16; i++)
 	{

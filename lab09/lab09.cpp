@@ -1,7 +1,9 @@
 //lab09.cpp
 #include "stdafx.h"
 
-#define ROUND(x)	(x>0.5?1:0)
+#define ROUND(x)				(x>0.5?1:0)
+#define NUMBER_OF_KEY			10
+#define ROUND_PER_KEY			1000
 
 int absmod(int x, int m)
 {
@@ -381,7 +383,7 @@ int main()
 
 	int dKK[32];
 	int dK[32];
-	int dKs[32];
+	int dKs[ROUND_PER_KEY][32];
 
 	int dX[32];
 	int dY[32];
@@ -405,24 +407,26 @@ int main()
 		P[i].p11 = 0;
 	}
 	
-	for (int i = 0; i < 32; i++)
-	{
-		switch (i)//rand()%50)
+	for (int j = 0; j < ROUND_PER_KEY; j++)
+		for (int i = 0; i < 32; i++)
 		{
-		case 0: dKs[i] = 0;
-			break;
-		case 1: dKs[i] = 1;
-			break;
-		default: dKs[i] = 2;
-			break;
+			switch (rand()%5)
+			{
+			case 0: dKs[j][i] = 0.0;
+				break;
+			case 1: dKs[j][i] = 1.0;
+				break;
+			default: dKs[j][i] = 0.5;
+				break;
+			}
 		}
-	}
 	/**/
-	for (int i = 0; i < 10000; i++)
+	for (int i = 0; i < NUMBER_OF_KEY; i++)
 	{
 		for (int i = 0; i < 4; i++)
 		{
 			ucK[i] = rand()%0x100;
+			//ucX[i] = rand()%0x100;
 		}
 
 		for(int i = 0; i < 4; i++)
@@ -434,7 +438,6 @@ int main()
 		uctoi(ucK, dKK);
 		uctoi(ucX, dX);
 		uctoi(ucY, dY);
-
 		/*
 		cout << "-----------------K orig--------------" << endl;
 		for (int i = 0; i < 32; i++)
@@ -446,12 +449,12 @@ int main()
 		/**/
 		//---------------------------------------------------------------------------------------
 
-		for (int t = 0; t < 1; t++)
+		for (int t = 0; t < ROUND_PER_KEY; t++)
 		{
 		
 			for (int i = 0; i < 32; i++)
 			{
-				dK[i] = dKs[i];
+				dK[i] = dKs[t][i];
 				/*
 				switch (rand()%50)
 				{
@@ -475,9 +478,7 @@ int main()
 			/**/
 			//---------------------------------------------------------------------------------------
 
-
 			dHx = alg1(dK, dX, dY, &ciph, m);
-
 
 			for (int i = 0; i < 32; i++)
 			{
@@ -496,7 +497,19 @@ int main()
 		/**/
 		//---------------------------------------------------------------------------------------
 	}
-	
+
+	cout << "\tN00\tN10\tN01\tN11" << endl ;
+	cout << fixed ;
+	cout << setprecision(2);
+	for (int i = 0; i < 32; i++)
+	{
+		cout << i << "\t";
+		cout << P[i].p00 << "\t";
+		cout << P[i].p10 << "\t";
+		cout << P[i].p01 << "\t";
+		cout << P[i].p11 << endl;
+	}
+
 	double temp;
 	for (int i = 0; i < 32; i++)
 	{
@@ -517,8 +530,8 @@ int main()
 		P[i].p11 = P[i].p11/temp;
 	}
 	/**/
-	cout << fixed ;
-	cout << setprecision(2);
+	cout << endl << endl;
+	cout << "\tp00\tp10\tp01\tp11" << endl ;
 	for (int i = 0; i < 32; i++)
 	{
 		cout << i << "\t";
@@ -528,6 +541,7 @@ int main()
 		cout << P[i].p11 << endl;
 	}
 	cout << endl << endl;
+	cout << "\tq00\tq10\tq01\tq11" << endl ;
 	for (int i = 0; i < 32; i++)
 	{
 		cout << i << "\t";
@@ -539,7 +553,6 @@ int main()
 	cout << endl << endl;
 	cout.unsetf ( ios_base::fixed );  
 
-	/**/
 	/*
 	cout << "-----------------K-------------------" << endl;
 	for (int i = 0; i < 32; i++)
@@ -571,7 +584,7 @@ int main()
 	/**/
 	//dHx = H(dK, dX, dY, &ciph, m);
 
-	cout << "H* = " << dHx << endl;
+	//cout << "H* = " << dHx << endl;
 	
 	/*
 	double s[] = {1, 1, 1, 1};
