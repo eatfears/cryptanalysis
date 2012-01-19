@@ -141,18 +141,85 @@ int main()
 	cout << "********************************************************************" << endl;
 	Show("Mx", ucMx);
 	Show("Mk", ucMk);
-	/*
-	double s[] = {1, 1, 1, 1};
-	SubInv(s);
-	cout << s[0] << s[1] << s[2] << s[3] << endl << endl;
 
-	
-	for (int i = 0; i < 16; i++)
+	/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
+
+
+	clock_t time;
+	int TIMES = 1000000;
+
+	//---------------------------------------------------------------------------------------
+	time = clock(); 
+	for (int count = 0; count < TIMES; count++)
 	{
-		int temp = ciph.sub->subs_inv[i];
-		cout << temp/2/2/2%2 << temp/2/2%2 << temp/2%2 << temp%2 << endl;
+		for(int i = 0; i < 4; i++)
+			ucY[i] = ucX[i];
+
+		ciph.CryptBlock(ucY,ucK);
 	}
-	/**/
+	time = clock() - time;
+	cout << "Without mask. " << TIMES << " times in " << (double)time/CLOCKS_PER_SEC << "sec." << endl;
+	//---------------------------------------------------------------------------------------
+	time = clock(); 
+	for (int count = 0; count < TIMES; count++)
+	{
+		for(int i = 0; i < 4; i++)
+			ucX1[i] = ucX[i];
+		for(int i = 0; i < 4; i++)
+			ucK1[i] = ucK[i];
+
+		for (int i = 0; i < 4; i++)
+		{
+			ucMx[i] = rand()%0x100;
+			ucMk[i] = rand()%0x100;
+		}
+
+		//---------------------------------------------------------------------------------------
+
+		for(int MSblock = 0; MSblock < 8; MSblock ++)
+		{
+			int MSindex;
+			for(int i = 0; i < 16; i++)
+			{
+				if (!(MSblock%2))	MSindex = i ^ ((ucMk[MSblock/2]&0xf0) >> 4) ^ ((ucMx[MSblock/2]&0xf0) >> 4);
+				else				MSindex = i ^ (ucMk[MSblock/2]&0x0f) ^ (ucMx[MSblock/2]&0x0f);
+				temp_sub[MSindex] = my_sub[i];
+			}
+
+			my_ms = vector<int>(temp_sub, temp_sub + 16);
+
+			//MS[MSblock] = Substitution(4, my_ms);
+		}
+
+
+		for(int i = 0; i < 4; i++)
+			ucY1[i] = ucX1[i];
+
+		for(int i = 0; i < 4; i++)
+			ucK1[i] ^= ucMk[i];
+		//for(int i = 0; i < 4; i++)
+		//	ucX1[i] ^= ucMx[i];
+
+		for(int c = 0; c < CYCLES; c++)
+		{
+			for(int i = 0; i < 4; i++)
+				ucY1[i] ^= ucMx[i];
+			for (int i = 0; i < 4; i++) ucY1[i]^=ucK1[i];
+
+
+			for(int i = 0; i < 4; i++)
+			{
+				ucY1[i] = 0x10*MS[2*i].subs[ucY1[i]>>4] + MS[2*i + 1].subs[ucY1[i] & 0x0f];
+			}
+			perm.PermutateBlock(ucY1);
+		}
+
+		for (int i = 0; i < 4; i++) ucY1[i]^=ucK1[i];
+		for (int i = 0; i < 4; i++) ucY1[i]^=ucMk[i];
+		}
+	time = clock() - time;
+	cout << "With mask. " << TIMES << " times in " << (double)time/CLOCKS_PER_SEC << " sec." << endl;
+
 
 	_getch();
 	return 0;
