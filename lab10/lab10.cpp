@@ -818,7 +818,7 @@ void work5a(Cipher *ciph, bool hacker)
 		cout << "CRACKER" << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block block ^_^" << endl;
+		cout << "H: I modified the bit in the first block ^_^" << endl;
 		cout << endl << endl;
 	}
 
@@ -900,7 +900,7 @@ void work5b(Cipher *ciph, bool hacker)
 		cout << "CRACKER" << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block block ^_^" << endl;
+		cout << "H: I modified the bit in the first block ^_^" << endl;
 		cout << endl << endl;
 	}
 
@@ -981,7 +981,7 @@ void work5c(Cipher *ciph, bool hacker)
 		cout << "CRACKER" << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block block ^_^" << endl;
+		cout << "H: I modified the bit in the first block ^_^" << endl;
 		cout << endl << endl;
 	}
 
