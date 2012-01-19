@@ -2,6 +2,10 @@
 #include "stdafx.h"
 #include <locale>
 
+#define HACKER_NAME "CRACKER"
+#define USER_1_NAME "USER1"
+#define USER_2_NAME "USER2"
+
 void uctoi(unsigned char *ucX, int *dX)
 {
 	unsigned char ucTemp;
@@ -25,12 +29,13 @@ void Show(char *name, unsigned char *ucX)
 	int dX[32];
 	uctoi(ucX, dX);
 
-	cout << name << ":" << endl;
+	if(name[0] != '\0') cout << name << ":" << endl;
 	for (int i = 0; i < 32; i++)
 	{	
-		cout << dX[i] << "\t";
-		if(!((i+1)%8)) cout << endl;
+		cout << dX[i];// << "\t";
+		//if(!((i+1)%8)) cout << endl;
 	}	
+	cout << endl;
 }
 
 #define BYTE_T		0x01
@@ -108,7 +113,7 @@ void work2a(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[9] = "MESSSAGE";
 	unsigned char S[4];
 	unsigned char Y0[8];
@@ -145,7 +150,7 @@ void work2a(Cipher *ciph, bool hacker)
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		unsigned char X1[9] = "CRACKkED";
 
 		cout << "X1: " << X1 << endl;
@@ -156,16 +161,16 @@ void work2a(Cipher *ciph, bool hacker)
 		Xor(X1 + 4, Y0 + 4, Y0 + 4);
 
 		Show("Y1 = X0 xor Y0 xor X1",Y0);
-		Show("",Y0+4);
+		Show("Y1 + 4",Y0 + 4);
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 
 	Xor(Y0, GAMMA, X0);
 	Xor(Y0 + 4, GAMMA + 4, X0 + 4);
 
-	cout << "USER2 decrypts message: " << X0 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X0 << endl;
 
 	cout << endl << endl;
 }
@@ -221,13 +226,11 @@ void work2b()
 	Show("Y1", Y1);
 	cout << endl << endl;
 
-	cout << "CRACKER" << endl << "-------------------------------------" << endl;
+	cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 	unsigned char temp[4];
 
 	Xor(Y0, Y1, temp);
 	Show("Y0 xor Y1", temp);
-	cout << endl << endl;
-
 	cout << endl << endl;
 }
 
@@ -238,7 +241,7 @@ void work3a(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[9] = "MESSSAGE";
 	unsigned char S[4];
 	unsigned char Y0[8];
@@ -275,12 +278,12 @@ void work3a(Cipher *ciph, bool hacker)
 
 	Xor(X0 + 4, GAMMA, Y0 + 4);
 
-	Show("Y0 + 4",Y0+4);
+	Show("Y0 + 4",Y0 + 4);
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		unsigned char X1[5] = "HACK";
 
 		cout << "X1: " << X1 << endl;
@@ -292,7 +295,7 @@ void work3a(Cipher *ciph, bool hacker)
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[9];
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = S[i];
@@ -306,7 +309,7 @@ void work3a(Cipher *ciph, bool hacker)
 
 	Xor(Y0 + 4, GAMMA, X3 + 4);
 	X3[8] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -318,7 +321,7 @@ void work3b(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[13];
@@ -373,7 +376,7 @@ void work3b(Cipher *ciph, bool hacker)
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 
 		for (int i = 0; i < 4; i++)
 			S[i] = Y0[i];
@@ -392,7 +395,7 @@ void work3b(Cipher *ciph, bool hacker)
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = S[i];
@@ -413,7 +416,7 @@ void work3b(Cipher *ciph, bool hacker)
 	Xor(Y0 + 8, GAMMA, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -425,7 +428,7 @@ void work3c(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[13];
@@ -462,7 +465,7 @@ void work3c(Cipher *ciph, bool hacker)
 
 	Xor(X0 + 4, GAMMA, Y0 + 4);
 
-	Show("Y0",Y0 + 4);
+	Show("Y0 + 4",Y0 + 4);
 	cout << endl << endl;
 	//----------------------------------------
 	for(int i = 0; i < 4; i++)
@@ -475,12 +478,12 @@ void work3c(Cipher *ciph, bool hacker)
 
 	Xor(X0 + 8, GAMMA, Y0 + 8);
 
-	Show("Y0",Y0 + 8);
+	Show("Y0 + 8",Y0 + 8);
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 
 		for (int i = 0; i < 4; i++)
 			Y0[i + 8] = 0;
@@ -489,7 +492,7 @@ void work3c(Cipher *ciph, bool hacker)
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = S[i];
@@ -510,7 +513,7 @@ void work3c(Cipher *ciph, bool hacker)
 	Xor(Y0 + 8, GAMMA, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -522,7 +525,7 @@ void work4a(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[9] = "MESSSAGE";
 	unsigned char S[4];
 	unsigned char Y0[8];
@@ -543,19 +546,18 @@ void work4a(Cipher *ciph, bool hacker)
 	Xor(X0, S, Y0);
 	ciph->CryptBlock(Y0, Key);
 
-	Show("Y0",Y0);
+	Show("Y0", Y0);
 	cout << endl << endl;
 
 	Xor(X0 + 4, Y0, Y0 + 4);
 	ciph->CryptBlock(Y0 + 4, Key);
 
-
-	Show("Y0 + 4",Y0+4);
+	Show("Y0 + 4", Y0 + 4);
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		unsigned char X1[5] = "HACK";
 
 		cout << "X1: " << X1 << endl;
@@ -563,11 +565,11 @@ void work4a(Cipher *ciph, bool hacker)
 		Xor(X0, S, S);
 		Xor(X1, S, S);
 
-		Show("S = S xor X0 xor X1",S);
+		Show("S = S xor X0 xor X1", S);
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[9];
 
 	for(int i = 0; i < 4; i++)
@@ -583,7 +585,7 @@ void work4a(Cipher *ciph, bool hacker)
 	Xor(X3 + 4, Y0, X3 + 4);
 
 	X3[8] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -595,7 +597,7 @@ void work4b(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[12];
@@ -636,7 +638,7 @@ void work4b(Cipher *ciph, bool hacker)
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		for (int i = 0; i < 4; i++)
 			S[i] = Y0[i];
 
@@ -654,7 +656,7 @@ void work4b(Cipher *ciph, bool hacker)
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 
 	for(int i = 0; i < 4; i++)
@@ -676,7 +678,7 @@ void work4b(Cipher *ciph, bool hacker)
 	Xor(X3 + 8, Y0 + 4, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -688,7 +690,7 @@ void work4c(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[12];
@@ -729,7 +731,7 @@ void work4c(Cipher *ciph, bool hacker)
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 
 		for (int i = 0; i < 4; i++)
 			Y0[i + 8] = 0;
@@ -738,7 +740,7 @@ void work4c(Cipher *ciph, bool hacker)
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 
 	for(int i = 0; i < 4; i++)
@@ -760,7 +762,7 @@ void work4c(Cipher *ciph, bool hacker)
 	Xor(X3 + 8, Y0 + 4, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -772,7 +774,7 @@ void work5a(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[13];
@@ -797,32 +799,22 @@ void work5a(Cipher *ciph, bool hacker)
 		GAMMA[i + 8] = GAMMA[i + 4];
 	ciph->CryptBlock(GAMMA + 8, Key);
 
-	Show("S",S);
-	cout << endl << endl;
-	Show("GAMMA",GAMMA);
-	Show("",GAMMA+4);
-	Show("",GAMMA+8);
-	cout << endl << endl;
-
 	Xor(X0, GAMMA, Y0);
 	Xor(X0 + 4, GAMMA + 4, Y0 + 4);
 	Xor(X0 + 8, GAMMA + 8, Y0 + 8);
-
-	Show("Y0",Y0);
-	Show("",Y0+4);
-	Show("",Y0+8);
+	
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block ^_^" << endl;
+		cout << "H: \"I modified the bit in the first block ^_^\"" << endl;
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 
 	Xor(Y0, GAMMA, X3);
@@ -830,7 +822,7 @@ void work5a(Cipher *ciph, bool hacker)
 	Xor(Y0 + 8, GAMMA + 8, X3 + 8);
 	
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -842,7 +834,7 @@ void work5b(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[13];
@@ -857,54 +849,36 @@ void work5b(Cipher *ciph, bool hacker)
 		S[i] = rand()%0x100;
 		GAMMA[i] = S[i];
 	}
+
 	ciph->CryptBlock(GAMMA, Key);
-
-	Show("S",S);
-	cout << endl << endl;
-	Show("GAMMA",GAMMA);
-	cout << endl << endl;
-
-
 	Xor(X0, GAMMA, Y0);
-	Show("Y0",Y0);
-	cout << endl << endl;
+
 	//----------------------------------------
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = Y0[i];
 
 	ciph->CryptBlock(GAMMA, Key);
-
-	Show("GAMMA",GAMMA);
-	cout << endl << endl;
-
 	Xor(X0 + 4, GAMMA, Y0 + 4);
 
-	Show("Y0",Y0 + 4);
-	cout << endl << endl;
 	//----------------------------------------
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = Y0[i + 4];
 
 	ciph->CryptBlock(GAMMA, Key);
-
-	Show("GAMMA",GAMMA);
-	cout << endl << endl;
-
 	Xor(X0 + 8, GAMMA, Y0 + 8);
 
-	Show("Y0",Y0 + 8);
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block ^_^" << endl;
+		cout << "H: \"I modified the bit in the first block ^_^\"" << endl;
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 	for(int i = 0; i < 4; i++)
 		GAMMA[i] = S[i];
@@ -925,7 +899,7 @@ void work5b(Cipher *ciph, bool hacker)
 	Xor(Y0 + 8, GAMMA, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -937,7 +911,7 @@ void work5c(Cipher *ciph, bool hacker)
 	cout << "-------------------------------------" << endl;
 
 
-	cout << "USER1" << endl << "-------------------------------------" << endl;
+	cout << USER_1_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X0[13] = "MESSSAGE_001";
 	unsigned char S[4];
 	unsigned char Y0[12];
@@ -951,41 +925,27 @@ void work5c(Cipher *ciph, bool hacker)
 		S[i] = rand()%0x100;
 	}
 
-	Show("S",S);
-	cout << endl << endl;
-
-
 	Xor(X0, S, Y0);
 	ciph->CryptBlock(Y0, Key);
-
-	Show("Y0",Y0);
-	cout << endl << endl;
 
 	Xor(X0 + 4, Y0, Y0 + 4);
 	ciph->CryptBlock(Y0 + 4, Key);
 
-
-	Show("Y0 + 4",Y0+4);
-	cout << endl << endl;
-
-
 	Xor(X0 + 8, Y0 + 4, Y0 + 8);
 	ciph->CryptBlock(Y0 + 8, Key);
 
-
-	Show("Y0 + 8",Y0+8);
 	cout << endl << endl;
 
 	if(hacker)
 	{
-		cout << "CRACKER" << endl << "-------------------------------------" << endl;
+		cout << HACKER_NAME << endl << "-------------------------------------" << endl;
 		Y0[0] ^= 1;
 
-		cout << "H: I modified the bit in the first block ^_^" << endl;
+		cout << "H: \"I modified the bit in the first block ^_^\"" << endl;
 		cout << endl << endl;
 	}
 
-	cout << "USER2" << endl << "-------------------------------------" << endl;
+	cout << USER_2_NAME << endl << "-------------------------------------" << endl;
 	unsigned char X3[13];
 
 	for(int i = 0; i < 4; i++)
@@ -1007,7 +967,7 @@ void work5c(Cipher *ciph, bool hacker)
 	Xor(X3 + 8, Y0 + 4, X3 + 8);
 
 	X3[12] = '\0';
-	cout << "USER2 decrypts message: " << X3 << endl;
+	cout << USER_2_NAME << " decrypts message: " << X3 << endl;
 
 	cout << endl << endl;
 }
@@ -1033,14 +993,14 @@ int main()
 	work2a(&ciph, true);
 	work2b();
 	work3a(&ciph, true);
-	work3b(&ciph, true);
-	work3c(&ciph, true);
-	work4a(&ciph, true);
-	work4b(&ciph, true);
-	work4c(&ciph, true);
-	work5a(&ciph, true);
-	work5b(&ciph, true);
-	work5c(&ciph, true);
+ 	work3b(&ciph, true);
+ 	work3c(&ciph, true);
+ 	work4a(&ciph, true);
+ 	work4b(&ciph, true);
+ 	work4c(&ciph, true);
+ 	work5a(&ciph, true);
+ 	work5b(&ciph, true);
+ 	work5c(&ciph, true);
 
 	_getch();
 	return 0;
