@@ -1,6 +1,9 @@
 //lab11.cpp
 #include "stdafx.h"
 
+#define TIME_MEASURE
+//#undef TIME_MEASURE
+
 void uctoi(unsigned char *ucX, int *dX)
 {
 	unsigned char ucTemp;
@@ -85,6 +88,12 @@ int main()
 	Permutation perm(32, my_p);
 	int temp_sub[16];
 	vector<int> my_ms;
+	unsigned char tempm[4];
+	unsigned char tempm2;
+
+	for(int i = 0; i < 4; i++)
+		tempm[i] = ucMx[i];
+	perm.PermutateBlockInverce(tempm);
 
 	MS = new Substitution[8];
 	for(int MSblock = 0; MSblock < 8; MSblock ++)
@@ -92,9 +101,17 @@ int main()
 		int MSindex;
 		for(int i = 0; i < 16; i++)
 		{
-			if (!(MSblock%2))	MSindex = i ^ ((ucMk[MSblock/2]&0xf0) >> 4) ^ ((ucMx[MSblock/2]&0xf0) >> 4);
-			else				MSindex = i ^ (ucMk[MSblock/2]&0x0f) ^ (ucMx[MSblock/2]&0x0f);
-			temp_sub[MSindex] = my_sub[i];
+			if (!(MSblock%2))	
+			{
+				MSindex = i ^ ((ucMk[MSblock/2]&0xf0) >> 4) ^ ((ucMx[MSblock/2]&0xf0) >> 4);
+				tempm2 = ((tempm[MSblock/2]&0xf0) >> 4);
+			}
+			else
+			{
+				MSindex = i ^ (ucMk[MSblock/2]&0x0f) ^ (ucMx[MSblock/2]&0x0f);
+				tempm2 = (tempm[MSblock/2]&0x0f);
+			}
+			temp_sub[MSindex] = my_sub[i] ^ tempm2;
 		}
 
 		my_ms = vector<int>(temp_sub, temp_sub + 16);
@@ -104,17 +121,16 @@ int main()
 
 
 	for(int i = 0; i < 4; i++)
-		ucY1[i] = ucX1[i];
-
-	for(int i = 0; i < 4; i++)
 		ucK1[i] ^= ucMk[i];
 	for(int i = 0; i < 4; i++)
 		ucX1[i] ^= ucMx[i];
 
+
+	for(int i = 0; i < 4; i++)
+		ucY1[i] = ucX1[i];
+
 	for(int c = 0; c < CYCLES; c++)
 	{
-		for(int i = 0; i < 4; i++)
-			ucY1[i] ^= ucMx[i];
 		for (int i = 0; i < 4; i++) ucY1[i]^=ucK1[i];
 
 
@@ -127,6 +143,7 @@ int main()
 
 	for (int i = 0; i < 4; i++) ucY1[i]^=ucK1[i];
 	for (int i = 0; i < 4; i++) ucY1[i]^=ucMk[i];
+	for (int i = 0; i < 4; i++) ucY1[i] ^= ucMx[i];
 
 	/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
 
@@ -145,6 +162,7 @@ int main()
 	/**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**//**/
 
 
+#ifdef TIME_MEASURE
 	clock_t time;
 	int TIMES = 1000000;
 
@@ -175,15 +193,26 @@ int main()
 		}
 
 		//---------------------------------------------------------------------------------------
+		for(int i = 0; i < 4; i++)
+			tempm[i] = ucMx[i];
+		perm.PermutateBlockInverce(tempm);
 
 		for(int MSblock = 0; MSblock < 8; MSblock ++)
 		{
 			int MSindex;
 			for(int i = 0; i < 16; i++)
 			{
-				if (!(MSblock%2))	MSindex = i ^ ((ucMk[MSblock/2]&0xf0) >> 4) ^ ((ucMx[MSblock/2]&0xf0) >> 4);
-				else				MSindex = i ^ (ucMk[MSblock/2]&0x0f) ^ (ucMx[MSblock/2]&0x0f);
-				temp_sub[MSindex] = my_sub[i];
+				if (!(MSblock%2))	
+				{
+					MSindex = i ^ ((ucMk[MSblock/2]&0xf0) >> 4) ^ ((ucMx[MSblock/2]&0xf0) >> 4);
+					tempm2 = ((tempm[MSblock/2]&0xf0) >> 4);
+				}
+				else
+				{
+					MSindex = i ^ (ucMk[MSblock/2]&0x0f) ^ (ucMx[MSblock/2]&0x0f);
+					tempm2 = (tempm[MSblock/2]&0x0f);
+				}
+				temp_sub[MSindex] = my_sub[i] ^ tempm2;
 			}
 
 			my_ms = vector<int>(temp_sub, temp_sub + 16);
@@ -219,7 +248,7 @@ int main()
 		}
 	time = clock() - time;
 	cout << "With mask. " << TIMES << " times in " << (double)time/CLOCKS_PER_SEC << " sec." << endl;
-
+#endif // TIME_MEASURE
 
 	_getch();
 	return 0;
